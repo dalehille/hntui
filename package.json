@@ -1,6 +1,7 @@
 {
   "name": "hntui",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.jsx",
   "scripts": {
     "start": "bun index.jsx",

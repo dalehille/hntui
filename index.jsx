@@ -6,6 +6,9 @@ import open from 'open';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import StoryList from './components/StoryList.jsx';
+import SearchBox from './components/SearchBox.jsx';
+import StoryModal from './components/StoryModal.jsx';
 
 const HackerNewsTUI = () => {
   const [stories, setStories] = useState([]);
@@ -349,31 +352,6 @@ const HackerNewsTUI = () => {
     }
   });
 
-  const formatTime = (timestamp) => {
-    const date = new Date(timestamp * 1000);
-    const now = new Date();
-    const diffHours = Math.floor((now - date) / (1000 * 60 * 60));
-
-    if (diffHours < 24) {
-      return `${diffHours}h ago`;
-    } else {
-      const diffDays = Math.floor(diffHours / 24);
-      return `${diffDays}d ago`;
-    }
-  };
-
-  const formatTitle = (title, maxLength = 70) => {
-    return title.length > maxLength ? title.slice(0, maxLength) + '...' : title;
-  };
-
-  const formatUrl = (url) => {
-    if (!url) return '';
-    try {
-      return new URL(url).hostname.replace('www.', '');
-    } catch {
-      return '';
-    }
-  };
 
   if (loading) {
     return (
@@ -406,114 +384,26 @@ const HackerNewsTUI = () => {
         </Text>
       </Box>
 
-      {searchMode && (
-        <Box marginBottom={1} backgroundColor="blue" paddingX={1}>
-          <Text color="white" bold>Search: /{searchQuery}</Text>
-          <Text color="gray" dimColor> • Press Enter to confirm or Escape to clear</Text>
+      {searchMode && <SearchBox searchQuery={searchQuery} />}
+
+      <StoryList
+        stories={filteredStories}
+        selectedIndex={selectedIndex}
+        scrollOffset={scrollOffset}
+        storiesPerPage={STORIES_PER_PAGE}
+      />
+
+      {filteredStories.length !== stories.length && (
+        <Box marginTop={1}>
+          <Text dimColor>Filtered from {stories.length} total</Text>
         </Box>
       )}
 
-      {filteredStories.slice(scrollOffset, scrollOffset + STORIES_PER_PAGE).map((story, index) => {
-        const actualIndex = scrollOffset + index;
-        const isSelected = actualIndex === selectedIndex;
-        const bgColor = isSelected ? 'blue' : undefined;
-        const textColor = isSelected ? 'white' : undefined;
-
-        return (
-          <Box key={story.id} backgroundColor={bgColor} paddingX={1}>
-            <Box width={3}>
-              <Text color={textColor}>
-                {(actualIndex + 1).toString().padStart(2, ' ')}.
-              </Text>
-            </Box>
-
-            <Box flexDirection="column" flexGrow={1}>
-              <Box>
-                <Text color={isSelected ? "yellow" : textColor} bold={isSelected}>
-                  {formatTitle(story.title)}
-                </Text>
-                {story.url && (
-                  <Text color={isSelected ? textColor : "gray"} dimColor={!isSelected}>
-                    {' '}({formatUrl(story.url)})
-                  </Text>
-                )}
-              </Box>
-
-              <Box>
-                <Text color={isSelected ? textColor : "gray"} dimColor={!isSelected}>
-                  {story.score || 0} points by {story.by} {formatTime(story.time)}
-                </Text>
-                <Text color={isSelected ? textColor : "red"} dimColor={!isSelected}>
-                  {' '}| {story.descendants || 0} comments
-                </Text>
-              </Box>
-            </Box>
-          </Box>
-        );
-      })}
-
-      <Box marginTop={1}>
-        <Text dimColor>
-          Showing {Math.min(STORIES_PER_PAGE, filteredStories.length - scrollOffset)} of {filteredStories.length} stories • Selected: {selectedIndex + 1}
-          {filteredStories.length !== stories.length && ` • Filtered from ${stories.length} total`}
-        </Text>
-      </Box>
-
       {modalOpen && selectedStory && (
-        <Box
-          position="absolute"
-          top="50%"
-          left="50%"
-          width="60%"
-          height="40%"
-          borderStyle="round"
-          borderColor="cyan"
-          backgroundColor="black"
-          padding={2}
-          flexDirection="column"
-        >
-          <Box marginBottom={2}>
-            <Text color="cyan" bold>Choose URL to open:</Text>
-          </Box>
-
-          <Box flexDirection="column" marginBottom={2}>
-            <Box
-              backgroundColor={modalSelectedOption === 0 ? 'blue' : undefined}
-              paddingX={1}
-              paddingY={0.5}
-            >
-              <Text color={modalSelectedOption === 0 ? 'white' : undefined}>
-                1. Open Hacker News comments
-              </Text>
-            </Box>
-
-            <Box
-              backgroundColor={modalSelectedOption === 1 ? 'blue' : undefined}
-              paddingX={1}
-              paddingY={0.5}
-            >
-              <Text color={modalSelectedOption === 1 ? 'white' : undefined}>
-                {selectedStory.url ? '2. Open article URL' : '2. No external URL available'}
-              </Text>
-            </Box>
-
-            <Box
-              backgroundColor={modalSelectedOption === 2 ? 'blue' : undefined}
-              paddingX={1}
-              paddingY={0.5}
-            >
-              <Text color={modalSelectedOption === 2 ? 'white' : undefined}>
-                3. Remove from list
-              </Text>
-            </Box>
-          </Box>
-
-          <Box>
-            <Text dimColor>
-              Use j/k to navigate • Enter to select • Escape to cancel
-            </Text>
-          </Box>
-        </Box>
+        <StoryModal
+          selectedStory={selectedStory}
+          modalSelectedOption={modalSelectedOption}
+        />
       )}
     </Box>
   );

@@ -1,0 +1,19 @@
+{
+  "name": "hntui",
+  "version": "1.0.0",
+  "main": "index.jsx",
+  "scripts": {
+    "start": "bun index.jsx",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bun": "1.2.22",
+    "ink": "6.3.1",
+    "open": "10.1.0",
+    "react": "19.1.1"
+  }
+}

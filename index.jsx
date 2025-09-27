@@ -23,10 +23,10 @@ const HackerNewsTUI = () => {
   const [removedStoryIds, setRemovedStoryIds] = useState(new Set());
   const [sortByComments, setSortByComments] = useState(true);
   const { exit } = useApp();
-  
+
   const STORIES_PER_PAGE = 15;
   const MAX_STORIES = 300;
-  
+
   // Get the path to the removed articles file
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
@@ -77,20 +77,20 @@ const HackerNewsTUI = () => {
     newRemovedIds.add(storyId);
     setRemovedStoryIds(newRemovedIds);
     saveRemovedArticles(newRemovedIds);
-    
+
     // Update the main stories list to remove the article
     const updatedStories = stories.filter(story => story.id !== storyId);
     setStories(updatedStories);
-    
+
     // If we're in search mode, re-apply the search filter
     if (searchMode) {
       // Re-filter the updated stories with the current search query
-      const reFiltered = updatedStories.filter(story => 
+      const reFiltered = updatedStories.filter(story =>
         story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (story.by && story.by.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (story.url && story.url.toLowerCase().includes(searchQuery.toLowerCase()))
       );
-      
+
       // If the filtered list becomes empty after re-filtering, exit search mode
       if (reFiltered.length === 0) {
         setSearchMode(false);
@@ -119,23 +119,23 @@ const HackerNewsTUI = () => {
   const fetchStories = async () => {
     try {
       setLoading(true);
-      
+
       // Get top story IDs
       const topStoriesResponse = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
       const topStoryIds = await topStoriesResponse.json();
-      
+
       // Fetch details for first 80 stories
       const storyPromises = topStoryIds.slice(0, MAX_STORIES).map(async (id) => {
         const response = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
         return response.json();
       });
-      
+
       const storyDetails = await Promise.all(storyPromises);
-      
+
       // Filter out deleted/dead stories, only show stories with 50+ comments
       const validStories = storyDetails
         .filter(story => story && !story.deleted && !story.dead && (story.descendants || 0) >= 50);
-      
+
       // Filter out removed stories and sort
       const storiesWithoutRemoved = validStories.filter(story => !removedIds.has(story.id));
       const sortedStories = sortStories(storiesWithoutRemoved);
@@ -152,7 +152,7 @@ const HackerNewsTUI = () => {
     const initializeApp = async () => {
       // Load removed articles first and get the IDs
       const removedIds = loadRemovedArticles();
-      
+
       // Then fetch stories with the removed IDs
       await fetchStoriesWithRemoved(removedIds);
     };
@@ -163,27 +163,27 @@ const HackerNewsTUI = () => {
   const fetchStoriesWithRemoved = async (removedIds = removedStoryIds) => {
     try {
       setLoading(true);
-      
+
       // Get top story IDs
       const topStoriesResponse = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
       const topStoryIds = await topStoriesResponse.json();
-      
+
       // Fetch details for first 80 stories
       const storyPromises = topStoryIds.slice(0, MAX_STORIES).map(async (id) => {
         const response = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
         return response.json();
       });
-      
+
       const storyDetails = await Promise.all(storyPromises);
-      
+
       // Filter out deleted/dead stories, only show stories with 50+ comments
       const validStories = storyDetails
         .filter(story => story && !story.deleted && !story.dead && (story.descendants || 0) >= 50);
-      
+
       // Filter out removed stories using the passed removedIds and sort
       const storiesWithoutRemoved = validStories.filter(story => !removedIds.has(story.id));
       const sortedStories = sortStories(storiesWithoutRemoved);
-      
+
       setStories(sortedStories);
       setFilteredStories(sortedStories);
       setLoading(false);
@@ -199,8 +199,8 @@ const HackerNewsTUI = () => {
       setFilteredStories(sortStories(stories, sortByComments));
       return;
     }
-    
-    const filtered = stories.filter(story => 
+
+    const filtered = stories.filter(story =>
       story.title.toLowerCase().includes(query.toLowerCase()) ||
       (story.by && story.by.toLowerCase().includes(query.toLowerCase())) ||
       (story.url && story.url.toLowerCase().includes(query.toLowerCase()))
@@ -212,7 +212,7 @@ const HackerNewsTUI = () => {
   const updateScrollAndSelection = (newSelectedIndex) => {
     const maxIndex = filteredStories.length - 1;
     const clampedIndex = Math.max(0, Math.min(newSelectedIndex, maxIndex));
-    
+
     // Calculate new scroll offset
     let newScrollOffset = scrollOffset;
     if (clampedIndex < scrollOffset) {
@@ -220,7 +220,7 @@ const HackerNewsTUI = () => {
     } else if (clampedIndex >= scrollOffset + STORIES_PER_PAGE) {
       newScrollOffset = clampedIndex - STORIES_PER_PAGE + 1;
     }
-    
+
     setScrollOffset(newScrollOffset);
     setSelectedIndex(clampedIndex);
   };
@@ -353,7 +353,7 @@ const HackerNewsTUI = () => {
     const date = new Date(timestamp * 1000);
     const now = new Date();
     const diffHours = Math.floor((now - date) / (1000 * 60 * 60));
-    
+
     if (diffHours < 24) {
       return `${diffHours}h ago`;
     } else {
@@ -399,7 +399,7 @@ const HackerNewsTUI = () => {
       <Box marginBottom={1}>
         <Text color="cyan" bold>🔥 Hacker News TUI - Sorted by {sortByComments ? 'Comments' : 'Date'}</Text>
       </Box>
-      
+
       <Box marginBottom={1}>
         <Text dimColor>
           Use ↑/↓ arrows or j/k to navigate • gg to top • G to bottom • / to search • Enter to view/remove URL • 'd' to remove • 'r' to refresh • 's' to sort • 'q' to quit
@@ -418,32 +418,32 @@ const HackerNewsTUI = () => {
         const isSelected = actualIndex === selectedIndex;
         const bgColor = isSelected ? 'blue' : undefined;
         const textColor = isSelected ? 'white' : undefined;
-        
+
         return (
           <Box key={story.id} backgroundColor={bgColor} paddingX={1}>
             <Box width={3}>
-              <Text color={textColor} dimColor={!isSelected}>
+              <Text color={textColor}>
                 {(actualIndex + 1).toString().padStart(2, ' ')}.
               </Text>
             </Box>
-            
+
             <Box flexDirection="column" flexGrow={1}>
               <Box>
-                <Text color={textColor} bold={isSelected}>
+                <Text color={isSelected ? "yellow" : textColor} bold={isSelected}>
                   {formatTitle(story.title)}
                 </Text>
                 {story.url && (
-                  <Text color="gray" dimColor>
+                  <Text color={isSelected ? textColor : "gray"} dimColor={!isSelected}>
                     {' '}({formatUrl(story.url)})
                   </Text>
                 )}
               </Box>
-              
+
               <Box>
-                <Text color="gray" dimColor>
+                <Text color={isSelected ? textColor : "gray"} dimColor={!isSelected}>
                   {story.score || 0} points by {story.by} {formatTime(story.time)}
                 </Text>
-                <Text color="yellow" dimColor>
+                <Text color={isSelected ? textColor : "red"} dimColor={!isSelected}>
                   {' '}| {story.descendants || 0} comments
                 </Text>
               </Box>
@@ -451,7 +451,7 @@ const HackerNewsTUI = () => {
           </Box>
         );
       })}
-      
+
       <Box marginTop={1}>
         <Text dimColor>
           Showing {Math.min(STORIES_PER_PAGE, filteredStories.length - scrollOffset)} of {filteredStories.length} stories • Selected: {selectedIndex + 1}
@@ -475,7 +475,7 @@ const HackerNewsTUI = () => {
           <Box marginBottom={2}>
             <Text color="cyan" bold>Choose URL to open:</Text>
           </Box>
-          
+
           <Box flexDirection="column" marginBottom={2}>
             <Box
               backgroundColor={modalSelectedOption === 0 ? 'blue' : undefined}
@@ -486,7 +486,7 @@ const HackerNewsTUI = () => {
                 1. Open Hacker News comments
               </Text>
             </Box>
-            
+
             <Box
               backgroundColor={modalSelectedOption === 1 ? 'blue' : undefined}
               paddingX={1}
@@ -496,7 +496,7 @@ const HackerNewsTUI = () => {
                 {selectedStory.url ? '2. Open article URL' : '2. No external URL available'}
               </Text>
             </Box>
-            
+
             <Box
               backgroundColor={modalSelectedOption === 2 ? 'blue' : undefined}
               paddingX={1}
@@ -507,7 +507,7 @@ const HackerNewsTUI = () => {
               </Text>
             </Box>
           </Box>
-          
+
           <Box>
             <Text dimColor>
               Use j/k to navigate • Enter to select • Escape to cancel

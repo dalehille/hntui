@@ -47,7 +47,7 @@ const HelpMenu = () => {
                 <Box flexDirection="column" marginLeft={2}>
                     <Box marginBottom={0}>
                         <Text color={colors.foreground}>Enter</Text>
-                        <Text dimColor={colors.dim}> - Open story modal</Text>
+                        <Text dimColor={colors.dim}> - Open modal</Text>
                     </Box>
 
                     <Box marginBottom={0}>

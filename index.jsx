@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import StoryList from './components/StoryList.jsx';
 import SearchBox from './components/SearchBox.jsx';
 import StoryModal from './components/StoryModal.jsx';
+import HelpMenu from './components/HelpMenu.jsx';
 
 const HackerNewsTUI = () => {
   const [stories, setStories] = useState([]);
@@ -18,6 +19,7 @@ const HackerNewsTUI = () => {
   const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
   const [modalSelectedOption, setModalSelectedOption] = useState(0);
   const [drawerSelectedOption, setDrawerSelectedOption] = useState(0);
@@ -305,6 +307,13 @@ const HackerNewsTUI = () => {
         setSelectedStory(null);
         setDrawerSelectedOption(0);
       }
+    } else if (helpOpen) {
+      // Help menu is open - handle help menu navigation
+      if (input === 'q' || key.ctrl && input === 'c') {
+        exit();
+      } else if (key.escape) {
+        setHelpOpen(false);
+      }
     } else {
       // Main navigation
       if (input === 'q' || key.ctrl && input === 'c') {
@@ -328,6 +337,10 @@ const HackerNewsTUI = () => {
         // Enter search mode
         setSearchMode(true);
         setSearchQuery('');
+        setGKeySequence('');
+      } else if (input === '?') {
+        // Open help menu
+        setHelpOpen(true);
         setGKeySequence('');
       } else if (input === 'g') {
         // Handle 'g' key sequence for 'gg' (go to top)
@@ -404,12 +417,6 @@ const HackerNewsTUI = () => {
           <Text color="cyan" bold>Hacker News - Sorted by {sortByComments ? 'Comments' : 'Date'}</Text>
         </Box>
 
-        <Box marginBottom={1}>
-          <Text dimColor>
-            Use ↑/↓ arrows or j/k to navigate • gg to top • G to bottom • / to search • Enter for modal • 'v' for drawer • Space to open HN • 'd' to remove • 'r' to refresh • 's' to sort • 'q' to quit
-          </Text>
-        </Box>
-
         {searchMode && <SearchBox searchQuery={searchQuery} />}
 
         <StoryList
@@ -431,6 +438,8 @@ const HackerNewsTUI = () => {
             modalSelectedOption={modalSelectedOption}
           />
         )}
+
+        {helpOpen && <HelpMenu />}
       </Box>
     </Box>
   );

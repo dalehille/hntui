@@ -9,7 +9,6 @@ import { fileURLToPath } from 'url';
 import StoryList from './components/StoryList.jsx';
 import SearchBox from './components/SearchBox.jsx';
 import StoryModal from './components/StoryModal.jsx';
-import StoryDrawer from './components/StoryDrawer.jsx';
 
 const HackerNewsTUI = () => {
   const [stories, setStories] = useState([]);
@@ -33,12 +32,10 @@ const HackerNewsTUI = () => {
   const STORIES_PER_PAGE = 15;
   const MAX_STORIES = 300;
 
-  // Get the path to the removed articles file
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   const removedArticlesPath = path.join(__dirname, '.removed-articles.json');
 
-  // Sort stories based on current sort mode
   const sortStories = (stories, sortByCommentsMode = sortByComments) => {
     return [...stories].sort((a, b) => {
       if (sortByCommentsMode) {
@@ -106,7 +103,6 @@ const HackerNewsTUI = () => {
         setScrollOffset(0);
       } else {
         setFilteredStories(reFiltered);
-        // Adjust selected index if needed
         if (selectedIndex >= reFiltered.length) {
           setSelectedIndex(Math.max(0, reFiltered.length - 1));
         }
@@ -114,7 +110,6 @@ const HackerNewsTUI = () => {
     } else {
       // Not in search mode, just update filtered stories
       setFilteredStories(updatedStories);
-      // Adjust selected index if needed
       if (selectedIndex >= updatedStories.length) {
         setSelectedIndex(Math.max(0, updatedStories.length - 1));
       }
@@ -133,70 +128,19 @@ const HackerNewsTUI = () => {
     }
   };
 
-  // Fetch top stories and their details
-  const fetchStories = async () => {
-    try {
-      setLoading(true);
-
-      // Check if we're in development mode
-      if (process.env.NODE_ENV === 'development') {
-        // Use sample data for development
-        const sampleStories = loadSampleData();
-        const storiesWithoutRemoved = sampleStories.filter(story => !removedStoryIds.has(story.id));
-        const sortedStories = sortStories(storiesWithoutRemoved);
-        setStories(sortedStories);
-        setFilteredStories(sortedStories);
-        setLoading(false);
-        return;
-      }
-
-      // Get top story IDs
-      const topStoriesResponse = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
-      const topStoryIds = await topStoriesResponse.json();
-
-      // Fetch details for first 80 stories
-      const storyPromises = topStoryIds.slice(0, MAX_STORIES).map(async (id) => {
-        const response = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
-        return response.json();
-      });
-
-      const storyDetails = await Promise.all(storyPromises);
-
-      // Filter out deleted/dead stories, only show stories with 50+ comments
-      const validStories = storyDetails
-        .filter(story => story && !story.deleted && !story.dead && (story.descendants || 0) >= 50);
-
-      // Filter out removed stories and sort
-      const storiesWithoutRemoved = validStories.filter(story => !removedStoryIds.has(story.id));
-      const sortedStories = sortStories(storiesWithoutRemoved);
-      setStories(sortedStories);
-      setFilteredStories(sortedStories);
-      setLoading(false);
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     const initializeApp = async () => {
-      // Load removed articles first and get the IDs
       const removedIds = loadRemovedArticles();
-
-      // Then fetch stories with the removed IDs
       await fetchStoriesWithRemoved(removedIds);
     };
     initializeApp();
   }, []);
 
-  // Modified fetchStories to accept removed IDs as parameter
   const fetchStoriesWithRemoved = async (removedIds = removedStoryIds) => {
     try {
       setLoading(true);
 
-      // Check if we're in development mode
       if (process.env.NODE_ENV === 'development') {
-        // Use sample data for development
         const sampleStories = loadSampleData();
         const storiesWithoutRemoved = sampleStories.filter(story => !removedIds.has(story.id));
         const sortedStories = sortStories(storiesWithoutRemoved);
@@ -206,11 +150,9 @@ const HackerNewsTUI = () => {
         return;
       }
 
-      // Get top story IDs
       const topStoriesResponse = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
       const topStoryIds = await topStoriesResponse.json();
 
-      // Fetch details for first 80 stories
       const storyPromises = topStoryIds.slice(0, MAX_STORIES).map(async (id) => {
         const response = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
         return response.json();
@@ -218,11 +160,9 @@ const HackerNewsTUI = () => {
 
       const storyDetails = await Promise.all(storyPromises);
 
-      // Filter out deleted/dead stories, only show stories with 50+ comments
       const validStories = storyDetails
         .filter(story => story && !story.deleted && !story.dead && (story.descendants || 0) >= 50);
 
-      // Filter out removed stories using the passed removedIds and sort
       const storiesWithoutRemoved = validStories.filter(story => !removedIds.has(story.id));
       const sortedStories = sortStories(storiesWithoutRemoved);
 
@@ -255,7 +195,6 @@ const HackerNewsTUI = () => {
     const maxIndex = filteredStories.length - 1;
     const clampedIndex = Math.max(0, Math.min(newSelectedIndex, maxIndex));
 
-    // Calculate new scroll offset
     let newScrollOffset = scrollOffset;
     if (clampedIndex < scrollOffset) {
       newScrollOffset = clampedIndex;
@@ -267,7 +206,6 @@ const HackerNewsTUI = () => {
     setSelectedIndex(clampedIndex);
   };
 
-  // Handle keyboard input
   useInput((input, key) => {
     if (searchMode) {
       // Search mode - handle search input
@@ -277,7 +215,7 @@ const HackerNewsTUI = () => {
         // Exit search mode and clear filter
         setSearchMode(false);
         setSearchQuery('');
-        setFilteredStories([...stories]); // Create a new array to ensure state update
+        setFilteredStories([...stories]);
         setSelectedIndex(0);
         setScrollOffset(0);
       } else if (key.return) {
@@ -325,7 +263,6 @@ const HackerNewsTUI = () => {
             console.log(`\nError opening URL: ${error.message}`);
           }
         } else if (modalSelectedOption === 2) {
-          // Remove article from list
           removeArticle(story.id);
         }
         setModalOpen(false);
@@ -424,13 +361,6 @@ const HackerNewsTUI = () => {
         setModalOpen(true);
         setModalSelectedOption(0);
         setGKeySequence('');
-      } else if (input === 'v' && filteredStories[selectedIndex]) {
-        // Open drawer with 'v' key
-        const story = filteredStories[selectedIndex];
-        setSelectedStory(story);
-        setDrawerOpen(true);
-        setDrawerSelectedOption(0);
-        setGKeySequence('');
       } else if (input === ' ' && filteredStories[selectedIndex]) {
         // Open HN comments page directly with spacebar
         const story = filteredStories[selectedIndex];
@@ -451,7 +381,7 @@ const HackerNewsTUI = () => {
   if (loading) {
     return (
       <Box flexDirection="column" padding={1}>
-        <Text color="cyan" bold>🔥 Hacker News TUI</Text>
+        <Text color="cyan" bold>Hacker News</Text>
         <Text>Loading stories sorted by {sortByComments ? 'comments' : 'date'}...</Text>
       </Box>
     );
@@ -471,7 +401,7 @@ const HackerNewsTUI = () => {
     <Box width="100%" height="100%">
       <Box flexDirection="column" padding={1}>
         <Box marginBottom={1}>
-          <Text color="cyan" bold>🔥 Hacker News TUI - Sorted by {sortByComments ? 'Comments' : 'Date'}</Text>
+          <Text color="cyan" bold>Hacker News - Sorted by {sortByComments ? 'Comments' : 'Date'}</Text>
         </Box>
 
         <Box marginBottom={1}>
@@ -502,19 +432,10 @@ const HackerNewsTUI = () => {
           />
         )}
       </Box>
-
-      {selectedStory && (
-        <StoryDrawer
-          selectedStory={selectedStory}
-          drawerSelectedOption={drawerSelectedOption}
-          isOpen={drawerOpen}
-        />
-      )}
     </Box>
   );
 };
 
-// Render the app
 render(<HackerNewsTUI />);
 
 export default HackerNewsTUI;

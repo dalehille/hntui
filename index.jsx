@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, createContext } from 'react';
 import { render, Text, Box, useInput, useApp } from 'ink';
 import open from 'open';
 import fs from 'fs';
@@ -11,7 +11,9 @@ import SearchBox from './components/SearchBox.jsx';
 import StoryModal from './components/StoryModal.jsx';
 import HelpMenu from './components/HelpMenu.jsx';
 
-const HackerNewsTUI = () => {
+export const ThemeContext = createContext(null);
+
+function App() {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -29,6 +31,9 @@ const HackerNewsTUI = () => {
   const [filteredStories, setFilteredStories] = useState([]);
   const [removedStoryIds, setRemovedStoryIds] = useState(new Set());
   const [sortByComments, setSortByComments] = useState(true);
+
+  const { colors } = useContext(ThemeContext);
+
   const { exit } = useApp();
 
   const STORIES_PER_PAGE = 15;
@@ -394,7 +399,7 @@ const HackerNewsTUI = () => {
   if (loading) {
     return (
       <Box flexDirection="column" padding={1}>
-        <Text color="cyan" bold>Hacker News</Text>
+        <Text color={colors.primary} bold>Hacker News</Text>
         <Text>Loading stories sorted by {sortByComments ? 'comments' : 'date'}...</Text>
       </Box>
     );
@@ -403,9 +408,9 @@ const HackerNewsTUI = () => {
   if (error) {
     return (
       <Box flexDirection="column" padding={1}>
-        <Text color="red" bold>Error loading stories:</Text>
+        <Text color={colors.error} bold>Error loading stories:</Text>
         <Text>{error}</Text>
-        <Text dimColor>Press 'q' to quit</Text>
+        <Text dimColor={colors.dim}>Press 'q' to quit</Text>
       </Box>
     );
   }
@@ -414,7 +419,7 @@ const HackerNewsTUI = () => {
     <Box width="100%" height="100%">
       <Box flexDirection="column" padding={1}>
         <Box marginBottom={1}>
-          <Text color="cyan" bold>Hacker News - Sorted by {sortByComments ? 'Comments' : 'Date'}</Text>
+          <Text color={colors.primary} bold>Hacker News - Sorted by {sortByComments ? 'Comments' : 'Date'}</Text>
         </Box>
 
         {searchMode && <SearchBox searchQuery={searchQuery} />}
@@ -428,7 +433,7 @@ const HackerNewsTUI = () => {
 
         {filteredStories.length !== stories.length && (
           <Box marginTop={1}>
-            <Text dimColor>Filtered from {stories.length} total</Text>
+            <Text dimColor={colors.dim}>Filtered from {stories.length} total</Text>
           </Box>
         )}
 
@@ -443,8 +448,51 @@ const HackerNewsTUI = () => {
       </Box>
     </Box>
   );
-};
+}
 
-render(<HackerNewsTUI />);
+function ThemeProvider({ children }) {
+  const themes = {
+    dark: {
+      foreground: 'white',
+      background: 'black',
+      primary: 'cyan',
+      secondary: 'yellow',
+      accent: 'blue',
+      dim: 'gray',
+      error: 'red',
+    },
+    light: {
+      foreground: 'black',
+      background: 'white',
+      primary: 'blue',
+      secondary: 'darkYellow',
+      accent: 'lightBlue',
+      dim: 'lightGray',
+      error: 'red',
+    },
+  };
+  const [themeName, setThemeName] = useState('dark');
+  const theme = themes[themeName];
 
-export default HackerNewsTUI;
+  useInput((input, key) => {
+    if (input === 't') {
+      setThemeName(currentThemeName => (currentThemeName === 'dark' ? 'light' : 'dark'));
+    }
+  });
+
+  const themeApi = {
+    theme,
+    setTheme: setThemeName,
+    colors: theme,
+  };
+
+  return (
+    <ThemeContext.Provider value={themeApi}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+render(<ThemeProvider><App /></ThemeProvider>);
+
+export default App;

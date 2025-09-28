@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Text, Box } from 'ink';
+import { ThemeContext } from '../index.jsx';
 
 const Story = ({ story, index, isSelected }) => {
+  const { colors } = useContext(ThemeContext);
+
   const formatTime = (timestamp) => {
     const date = new Date(timestamp * 1000);
     const now = new Date();
@@ -28,8 +31,8 @@ const Story = ({ story, index, isSelected }) => {
     }
   };
 
-  const bgColor = isSelected ? 'blue' : undefined;
-  const textColor = isSelected ? 'white' : undefined;
+  const bgColor = isSelected ? colors.accent : undefined;
+  const textColor = isSelected ? colors.foreground : undefined;
 
   return (
     <Box key={story.id} backgroundColor={bgColor} paddingX={1}>
@@ -41,21 +44,21 @@ const Story = ({ story, index, isSelected }) => {
 
       <Box flexDirection="column" flexGrow={1}>
         <Box>
-          <Text color={isSelected ? "yellow" : textColor} bold={isSelected}>
+          <Text color={isSelected ? colors.secondary : textColor} bold={isSelected}>
             {formatTitle(story.title)}
           </Text>
           {story.url && (
-            <Text color={isSelected ? textColor : "gray"} dimColor={!isSelected}>
+            <Text color={isSelected ? textColor : colors.dim} dimColor={!isSelected}>
               {' '}({formatUrl(story.url)})
             </Text>
           )}
         </Box>
 
         <Box>
-          <Text color={isSelected ? textColor : "gray"} dimColor={!isSelected}>
+          <Text color={isSelected ? textColor : colors.dim} dimColor={!isSelected}>
             {story.score || 0} points by {story.by} {formatTime(story.time)}
           </Text>
-          <Text color={isSelected ? textColor : "red"} dimColor={!isSelected}>
+          <Text color={isSelected ? textColor : colors.error} dimColor={!isSelected}>
             {' '}| {story.descendants || 0} comments
           </Text>
         </Box>

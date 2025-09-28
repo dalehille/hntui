@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Box, Text } from 'ink';
+import { ThemeContext } from '../index.jsx';
 
 const StoryModal = ({ selectedStory, modalSelectedOption }) => {
+  const { colors } = useContext(ThemeContext);
+
   return (
     <Box
       position="absolute"
@@ -10,55 +13,55 @@ const StoryModal = ({ selectedStory, modalSelectedOption }) => {
       width="60%"
       height="40%"
       borderStyle="round"
-      borderColor="cyan"
-      backgroundColor="black"
+      borderColor={colors.primary}
+      backgroundColor={colors.background}
       padding={2}
       flexDirection="column"
     >
       <Box marginBottom={2}>
-        <Text color="cyan" bold>Choose URL to open:</Text>
+        <Text color={colors.primary} bold>Choose URL to open:</Text>
       </Box>
 
       <Box flexDirection="column" marginBottom={2}>
         <Box
-          backgroundColor={modalSelectedOption === 0 ? 'blue' : undefined}
+          backgroundColor={modalSelectedOption === 0 ? colors.accent : undefined}
           paddingX={1}
           paddingY={0.5}
         >
-          <Text color={modalSelectedOption === 0 ? 'white' : undefined}>
+          <Text color={modalSelectedOption === 0 ? colors.foreground : undefined}>
             1. Open Hacker News comments
           </Text>
         </Box>
 
         <Box
-          backgroundColor={modalSelectedOption === 1 ? 'blue' : undefined}
+          backgroundColor={modalSelectedOption === 1 ? colors.accent : undefined}
           paddingX={1}
           paddingY={0.5}
           flexDirection="column"
         >
-          <Text color={modalSelectedOption === 1 ? 'white' : undefined}>
+          <Text color={modalSelectedOption === 1 ? colors.foreground : undefined}>
             {selectedStory.url ? '2. Open article URL' : '2. No external URL available'}
           </Text>
           {selectedStory.url && modalSelectedOption === 1 && (
-            <Text color="white" dimColor>
+            <Text color={colors.foreground} dimColor={colors.dim}>
               {selectedStory.url}
             </Text>
           )}
         </Box>
 
         <Box
-          backgroundColor={modalSelectedOption === 2 ? 'blue' : undefined}
+          backgroundColor={modalSelectedOption === 2 ? colors.accent : undefined}
           paddingX={1}
           paddingY={0.5}
         >
-          <Text color={modalSelectedOption === 2 ? 'white' : undefined}>
+          <Text color={modalSelectedOption === 2 ? colors.foreground : undefined}>
             3. Remove from list
           </Text>
         </Box>
       </Box>
 
       <Box>
-        <Text dimColor>
+        <Text dimColor={colors.dim}>
           Use j/k to navigate • Enter to select • Escape to cancel
         </Text>
       </Box>

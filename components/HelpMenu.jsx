@@ -1,103 +1,111 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Box, Text } from 'ink';
+import { ThemeContext } from '../index.jsx';
 
 const HelpMenu = () => {
+    const { colors } = useContext(ThemeContext);
+
     return (
         <Box
             position="absolute"
             top="0"
             left="0"
             width="100%"
-            height="70%"
+            height="90%"
             borderStyle="round"
             borderColor="green"
-            backgroundColor="black"
+            backgroundColor={colors.background}
             padding={0}
             flexDirection="column"
         >
             <Box flexDirection="column" marginBottom={1}>
                 <Box marginBottom={1}>
-                    <Text color="yellow" bold>Navigation:</Text>
+                    <Text color={colors.secondary} bold>Navigation:</Text>
                 </Box>
 
                 <Box flexDirection="column" marginLeft={2}>
                     <Box marginBottom={0}>
-                        <Text color="white">↑/↓ arrows or j/k</Text>
-                        <Text dimColor> - Navigate stories</Text>
+                        <Text color={colors.foreground}>↑/↓ arrows or j/k</Text>
+                        <Text dimColor={colors.dim}> - Navigate stories</Text>
                     </Box>
 
                     <Box marginBottom={0}>
-                        <Text color="white">gg</Text>
-                        <Text dimColor> - Go to top</Text>
+                        <Text color={colors.foreground}>gg</Text>
+                        <Text dimColor={colors.dim}> - Go to top</Text>
                     </Box>
 
                     <Box marginBottom={0}>
-                        <Text color="white">G</Text>
-                        <Text dimColor> - Go to bottom</Text>
+                        <Text color={colors.foreground}>G</Text>
+                        <Text dimColor={colors.dim}> - Go to bottom</Text>
                     </Box>
                 </Box>
 
                 <Box marginBottom={0} marginTop={1}>
-                    <Text color="yellow" bold>Actions:</Text>
+                    <Text color={colors.secondary} bold>Actions:</Text>
                 </Box>
 
                 <Box flexDirection="column" marginLeft={2}>
                     <Box marginBottom={0}>
-                        <Text color="white">Enter</Text>
-                        <Text dimColor> - Open story modal</Text>
+                        <Text color={colors.foreground}>Enter</Text>
+                        <Text dimColor={colors.dim}> - Open story modal</Text>
                     </Box>
 
                     <Box marginBottom={0}>
-                        <Text color="white">Space</Text>
-                        <Text dimColor> - Open HN comments directly</Text>
+                        <Text color={colors.foreground}>Space</Text>
+                        <Text dimColor={colors.dim}> - Open HN comments directly</Text>
                     </Box>
 
                     <Box marginBottom={0}>
-                        <Text color="white">d</Text>
-                        <Text dimColor> - Remove story from list</Text>
+                        <Text color={colors.foreground}>d</Text>
+                        <Text dimColor={colors.dim}> - Remove story from list</Text>
                     </Box>
                 </Box>
 
                 <Box marginBottom={0} marginTop={1}>
-                    <Text color="yellow" bold>Search & Sort:</Text>
+                    <Text color={colors.secondary} bold>Search & Sort:</Text>
                 </Box>
 
                 <Box flexDirection="column" marginLeft={2}>
                     <Box marginBottom={0}>
-                        <Text color="white">/</Text>
-                        <Text dimColor> - Enter search mode</Text>
+                        <Text color={colors.foreground}>/</Text>
+                        <Text dimColor={colors.dim}> - Enter search mode</Text>
                     </Box>
 
                     <Box marginBottom={0}>
-                        <Text color="white">s</Text>
-                        <Text dimColor> - Toggle sort (comments/date)</Text>
+                        <Text color={colors.foreground}>s</Text>
+                        <Text dimColor={colors.dim}> - Toggle sort (comments/date)</Text>
                     </Box>
 
                     <Box marginBottom={0}>
-                        <Text color="white">r</Text>
-                        <Text dimColor> - Refresh stories</Text>
+                        <Text color={colors.foreground}>r</Text>
+                        <Text dimColor={colors.dim}> - Refresh stories</Text>
                     </Box>
                 </Box>
 
                 <Box marginBottom={0} marginTop={1}>
-                    <Text color="yellow" bold>System:</Text>
+                    <Text color={colors.secondary} bold>System:</Text>
                 </Box>
 
                 <Box flexDirection="column" marginLeft={2}>
                     <Box marginBottom={0}>
-                        <Text color="white">?</Text>
-                        <Text dimColor> - Show this help menu</Text>
+                        <Text color={colors.foreground}>?</Text>
+                        <Text dimColor={colors.dim}> - Show this help menu</Text>
                     </Box>
 
                     <Box marginBottom={0}>
-                        <Text color="white">q or Ctrl+C</Text>
-                        <Text dimColor> - Quit application</Text>
+                        <Text color={colors.foreground}>t</Text>
+                        <Text dimColor={colors.dim}> - Toggle dark/light theme</Text>
+                    </Box>
+
+                    <Box marginBottom={0}>
+                        <Text color={colors.foreground}>q or Ctrl+C</Text>
+                        <Text dimColor={colors.dim}> - Quit application</Text>
                     </Box>
                 </Box>
             </Box>
 
             <Box>
-                <Text dimColor>
+                <Text dimColor={colors.dim}>
                     Press Escape to close this help menu
                 </Text>
             </Box>

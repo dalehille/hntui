@@ -431,6 +431,15 @@ const HackerNewsTUI = () => {
         setDrawerOpen(true);
         setDrawerSelectedOption(0);
         setGKeySequence('');
+      } else if (input === ' ' && filteredStories[selectedIndex]) {
+        // Open HN comments page directly with spacebar
+        const story = filteredStories[selectedIndex];
+        try {
+          open(`https://news.ycombinator.com/item?id=${story.id}`);
+        } catch (error) {
+          console.log(`\nError opening HN URL: ${error.message}`);
+        }
+        setGKeySequence('');
       } else {
         // Reset 'g' sequence for any other key
         setGKeySequence('');
@@ -467,7 +476,7 @@ const HackerNewsTUI = () => {
 
         <Box marginBottom={1}>
           <Text dimColor>
-            Use ↑/↓ arrows or j/k to navigate • gg to top • G to bottom • / to search • Enter for modal • 'v' for drawer • 'd' to remove • 'r' to refresh • 's' to sort • 'q' to quit
+            Use ↑/↓ arrows or j/k to navigate • gg to top • G to bottom • / to search • Enter for modal • 'v' for drawer • Space to open HN • 'd' to remove • 'r' to refresh • 's' to sort • 'q' to quit
           </Text>
         </Box>
 

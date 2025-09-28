@@ -34,10 +34,16 @@ const StoryModal = ({ selectedStory, modalSelectedOption }) => {
           backgroundColor={modalSelectedOption === 1 ? 'blue' : undefined}
           paddingX={1}
           paddingY={0.5}
+          flexDirection="column"
         >
           <Text color={modalSelectedOption === 1 ? 'white' : undefined}>
             {selectedStory.url ? '2. Open article URL' : '2. No external URL available'}
           </Text>
+          {selectedStory.url && modalSelectedOption === 1 && (
+            <Text color="white" dimColor>
+              {selectedStory.url}
+            </Text>
+          )}
         </Box>
 
         <Box

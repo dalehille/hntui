@@ -5,6 +5,7 @@
   "main": "index.jsx",
   "scripts": {
     "start": "bun index.jsx",
+    "dev": "NODE_ENV=development bun --watch index.jsx",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

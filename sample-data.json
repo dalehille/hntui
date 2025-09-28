@@ -1,0 +1,252 @@
+[
+    {
+        "id": 40000001,
+        "title": "Show HN: I built a terminal-based Hacker News reader in React",
+        "url": "https://github.com/example/hntui",
+        "score": 156,
+        "by": "developer123",
+        "time": 1704067200,
+        "descendants": 89,
+        "type": "story"
+    },
+    {
+        "id": 40000002,
+        "title": "The future of web development: Why TypeScript is becoming essential",
+        "url": "https://example.com/typescript-future",
+        "score": 234,
+        "by": "typescript_fan",
+        "time": 1704063600,
+        "descendants": 156,
+        "type": "story"
+    },
+    {
+        "id": 40000003,
+        "title": "Ask HN: What's your favorite programming language and why?",
+        "url": null,
+        "score": 89,
+        "by": "curious_dev",
+        "time": 1704056400,
+        "descendants": 203,
+        "type": "story"
+    },
+    {
+        "id": 40000004,
+        "title": "Rust vs Go: A comprehensive comparison for systems programming",
+        "url": "https://blog.example.com/rust-vs-go",
+        "score": 178,
+        "by": "systems_engineer",
+        "time": 1704049200,
+        "descendants": 127,
+        "type": "story"
+    },
+    {
+        "id": 40000005,
+        "title": "The hidden costs of technical debt in startup environments",
+        "url": "https://startup.example.com/technical-debt",
+        "score": 145,
+        "by": "startup_founder",
+        "time": 1704042000,
+        "descendants": 98,
+        "type": "story"
+    },
+    {
+        "id": 40000006,
+        "title": "Show HN: A new approach to database indexing that's 10x faster",
+        "url": "https://github.com/example/fastdb",
+        "score": 267,
+        "by": "db_researcher",
+        "time": 1704034800,
+        "descendants": 189,
+        "type": "story"
+    },
+    {
+        "id": 40000007,
+        "title": "Why I switched from VS Code to Neovim after 5 years",
+        "url": "https://dev.example.com/vscode-to-neovim",
+        "score": 198,
+        "by": "vim_enthusiast",
+        "time": 1704027600,
+        "descendants": 142,
+        "type": "story"
+    },
+    {
+        "id": 40000008,
+        "title": "The complete guide to building scalable microservices with Docker",
+        "url": "https://docker.example.com/microservices-guide",
+        "score": 223,
+        "by": "devops_expert",
+        "time": 1704020400,
+        "descendants": 167,
+        "type": "story"
+    },
+    {
+        "id": 40000009,
+        "title": "Ask HN: How do you stay productive while working remotely?",
+        "url": null,
+        "score": 112,
+        "by": "remote_worker",
+        "time": 1704013200,
+        "descendants": 134,
+        "type": "story"
+    },
+    {
+        "id": 40000010,
+        "title": "Machine learning in production: Lessons learned from 3 years at scale",
+        "url": "https://ml.example.com/production-lessons",
+        "score": 189,
+        "by": "ml_engineer",
+        "time": 1704006000,
+        "descendants": 156,
+        "type": "story"
+    },
+    {
+        "id": 40000011,
+        "title": "Show HN: I built a real-time collaborative code editor in 2 weeks",
+        "url": "https://github.com/example/collab-editor",
+        "score": 145,
+        "by": "collab_dev",
+        "time": 1703998800,
+        "descendants": 78,
+        "type": "story"
+    },
+    {
+        "id": 40000012,
+        "title": "The evolution of JavaScript: From ES5 to ES2024 and beyond",
+        "url": "https://js.example.com/evolution-guide",
+        "score": 167,
+        "by": "js_historian",
+        "time": 1703991600,
+        "descendants": 123,
+        "type": "story"
+    },
+    {
+        "id": 40000013,
+        "title": "Why I'm moving away from React to Svelte for new projects",
+        "url": "https://svelte.example.com/react-to-svelte",
+        "score": 134,
+        "by": "svelte_advocate",
+        "time": 1703984400,
+        "descendants": 89,
+        "type": "story"
+    },
+    {
+        "id": 40000014,
+        "title": "Ask HN: What's the most overrated technology in 2024?",
+        "url": null,
+        "score": 98,
+        "by": "tech_critic",
+        "time": 1703977200,
+        "descendants": 145,
+        "type": "story"
+    },
+    {
+        "id": 40000015,
+        "title": "Building a distributed system that handles 1M requests per second",
+        "url": "https://scale.example.com/distributed-systems",
+        "score": 256,
+        "by": "scale_engineer",
+        "time": 1703970000,
+        "descendants": 178,
+        "type": "story"
+    },
+    {
+        "id": 40000016,
+        "title": "Show HN: A new programming language designed for AI development",
+        "url": "https://github.com/example/ai-lang",
+        "score": 201,
+        "by": "ai_language_creator",
+        "time": 1703962800,
+        "descendants": 134,
+        "type": "story"
+    },
+    {
+        "id": 40000017,
+        "title": "The psychology of code reviews: How to give and receive feedback",
+        "url": "https://team.example.com/code-review-psychology",
+        "score": 123,
+        "by": "team_lead",
+        "time": 1703955600,
+        "descendants": 67,
+        "type": "story"
+    },
+    {
+        "id": 40000018,
+        "title": "Why I switched from Python to Rust for data processing",
+        "url": "https://performance.example.com/python-to-rust",
+        "score": 178,
+        "by": "data_engineer",
+        "time": 1703948400,
+        "descendants": 112,
+        "type": "story"
+    },
+    {
+        "id": 40000019,
+        "title": "Ask HN: How do you handle technical interviews as a senior developer?",
+        "url": null,
+        "score": 89,
+        "by": "senior_dev",
+        "time": 1703941200,
+        "descendants": 98,
+        "type": "story"
+    },
+    {
+        "id": 40000020,
+        "title": "The complete guide to building a real-time chat application",
+        "url": "https://chat.example.com/building-guide",
+        "score": 156,
+        "by": "chat_developer",
+        "time": 1703934000,
+        "descendants": 89,
+        "type": "story"
+    },
+    {
+        "id": 40000021,
+        "title": "Show HN: I built a terminal-based task manager with natural language",
+        "url": "https://github.com/example/natural-tasks",
+        "score": 134,
+        "by": "productivity_dev",
+        "time": 1703926800,
+        "descendants": 56,
+        "type": "story"
+    },
+    {
+        "id": 40000022,
+        "title": "The hidden complexity of simple algorithms",
+        "url": "https://algorithms.example.com/hidden-complexity",
+        "score": 167,
+        "by": "algorithm_expert",
+        "time": 1703919600,
+        "descendants": 78,
+        "type": "story"
+    },
+    {
+        "id": 40000023,
+        "title": "Why I'm building my own operating system in 2024",
+        "url": "https://os.example.com/building-os",
+        "score": 234,
+        "by": "os_developer",
+        "time": 1703912400,
+        "descendants": 189,
+        "type": "story"
+    },
+    {
+        "id": 40000024,
+        "title": "Ask HN: What's the best way to learn system design?",
+        "url": null,
+        "score": 112,
+        "by": "junior_engineer",
+        "time": 1703905200,
+        "descendants": 123,
+        "type": "story"
+    },
+    {
+        "id": 40000025,
+        "title": "The future of web browsers: What's coming in 2024",
+        "url": "https://browser.example.com/future-2024",
+        "score": 145,
+        "by": "browser_expert",
+        "time": 1703898000,
+        "descendants": 67,
+        "type": "story"
+    }
+]

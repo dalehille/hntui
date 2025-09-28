@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import StoryList from './components/StoryList.jsx';
 import SearchBox from './components/SearchBox.jsx';
 import StoryModal from './components/StoryModal.jsx';
+import StoryDrawer from './components/StoryDrawer.jsx';
 
 const HackerNewsTUI = () => {
   const [stories, setStories] = useState([]);
@@ -17,8 +18,10 @@ const HackerNewsTUI = () => {
   const [scrollOffset, setScrollOffset] = useState(0);
   const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
   const [modalSelectedOption, setModalSelectedOption] = useState(0);
+  const [drawerSelectedOption, setDrawerSelectedOption] = useState(0);
   const [gKeySequence, setGKeySequence] = useState('');
   const [searchMode, setSearchMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -118,10 +121,34 @@ const HackerNewsTUI = () => {
     }
   };
 
+  // Load sample data for development
+  const loadSampleData = () => {
+    try {
+      const sampleDataPath = path.join(__dirname, 'sample-data.json');
+      const sampleData = JSON.parse(fs.readFileSync(sampleDataPath, 'utf8'));
+      return sampleData;
+    } catch (error) {
+      console.error('Error loading sample data:', error);
+      return [];
+    }
+  };
+
   // Fetch top stories and their details
   const fetchStories = async () => {
     try {
       setLoading(true);
+
+      // Check if we're in development mode
+      if (process.env.NODE_ENV === 'development') {
+        // Use sample data for development
+        const sampleStories = loadSampleData();
+        const storiesWithoutRemoved = sampleStories.filter(story => !removedStoryIds.has(story.id));
+        const sortedStories = sortStories(storiesWithoutRemoved);
+        setStories(sortedStories);
+        setFilteredStories(sortedStories);
+        setLoading(false);
+        return;
+      }
 
       // Get top story IDs
       const topStoriesResponse = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
@@ -140,7 +167,7 @@ const HackerNewsTUI = () => {
         .filter(story => story && !story.deleted && !story.dead && (story.descendants || 0) >= 50);
 
       // Filter out removed stories and sort
-      const storiesWithoutRemoved = validStories.filter(story => !removedIds.has(story.id));
+      const storiesWithoutRemoved = validStories.filter(story => !removedStoryIds.has(story.id));
       const sortedStories = sortStories(storiesWithoutRemoved);
       setStories(sortedStories);
       setFilteredStories(sortedStories);
@@ -166,6 +193,18 @@ const HackerNewsTUI = () => {
   const fetchStoriesWithRemoved = async (removedIds = removedStoryIds) => {
     try {
       setLoading(true);
+
+      // Check if we're in development mode
+      if (process.env.NODE_ENV === 'development') {
+        // Use sample data for development
+        const sampleStories = loadSampleData();
+        const storiesWithoutRemoved = sampleStories.filter(story => !removedIds.has(story.id));
+        const sortedStories = sortStories(storiesWithoutRemoved);
+        setStories(sortedStories);
+        setFilteredStories(sortedStories);
+        setLoading(false);
+        return;
+      }
 
       // Get top story IDs
       const topStoriesResponse = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
@@ -232,7 +271,9 @@ const HackerNewsTUI = () => {
   useInput((input, key) => {
     if (searchMode) {
       // Search mode - handle search input
-      if (key.escape) {
+      if (input === 'q' || key.ctrl && input === 'c') {
+        exit();
+      } else if (key.escape) {
         // Exit search mode and clear filter
         setSearchMode(false);
         setSearchQuery('');
@@ -257,7 +298,9 @@ const HackerNewsTUI = () => {
       }
     } else if (modalOpen) {
       // Modal is open - handle modal navigation
-      if (key.escape) {
+      if (input === 'q' || key.ctrl && input === 'c') {
+        exit();
+      } else if (key.escape) {
         setModalOpen(false);
         setSelectedStory(null);
         setModalSelectedOption(0);
@@ -288,6 +331,42 @@ const HackerNewsTUI = () => {
         setModalOpen(false);
         setSelectedStory(null);
         setModalSelectedOption(0);
+      }
+    } else if (drawerOpen) {
+      // Drawer is open - handle drawer navigation
+      if (input === 'q' || key.ctrl && input === 'c') {
+        exit();
+      } else if (key.escape) {
+        setDrawerOpen(false);
+        setSelectedStory(null);
+        setDrawerSelectedOption(0);
+      } else if (key.upArrow || input === 'k') {
+        setDrawerSelectedOption(prev => Math.max(0, prev - 1));
+      } else if (key.downArrow || input === 'j') {
+        setDrawerSelectedOption(prev => Math.min(2, prev + 1));
+      } else if (key.return) {
+        const story = selectedStory;
+        if (drawerSelectedOption === 0) {
+          // Open HN URL (comments)
+          try {
+            open(`https://news.ycombinator.com/item?id=${story.id}`);
+          } catch (error) {
+            console.log(`\nError opening HN URL: ${error.message}`);
+          }
+        } else if (drawerSelectedOption === 1 && story.url) {
+          // Open actual URL
+          try {
+            open(story.url);
+          } catch (error) {
+            console.log(`\nError opening URL: ${error.message}`);
+          }
+        } else if (drawerSelectedOption === 2) {
+          // Remove article from list
+          removeArticle(story.id);
+        }
+        setDrawerOpen(false);
+        setSelectedStory(null);
+        setDrawerSelectedOption(0);
       }
     } else {
       // Main navigation
@@ -345,6 +424,13 @@ const HackerNewsTUI = () => {
         setModalOpen(true);
         setModalSelectedOption(0);
         setGKeySequence('');
+      } else if (input === 'v' && filteredStories[selectedIndex]) {
+        // Open drawer with 'v' key
+        const story = filteredStories[selectedIndex];
+        setSelectedStory(story);
+        setDrawerOpen(true);
+        setDrawerSelectedOption(0);
+        setGKeySequence('');
       } else {
         // Reset 'g' sequence for any other key
         setGKeySequence('');
@@ -373,36 +459,46 @@ const HackerNewsTUI = () => {
   }
 
   return (
-    <Box flexDirection="column" padding={1}>
-      <Box marginBottom={1}>
-        <Text color="cyan" bold>🔥 Hacker News TUI - Sorted by {sortByComments ? 'Comments' : 'Date'}</Text>
-      </Box>
-
-      <Box marginBottom={1}>
-        <Text dimColor>
-          Use ↑/↓ arrows or j/k to navigate • gg to top • G to bottom • / to search • Enter to view/remove URL • 'd' to remove • 'r' to refresh • 's' to sort • 'q' to quit
-        </Text>
-      </Box>
-
-      {searchMode && <SearchBox searchQuery={searchQuery} />}
-
-      <StoryList
-        stories={filteredStories}
-        selectedIndex={selectedIndex}
-        scrollOffset={scrollOffset}
-        storiesPerPage={STORIES_PER_PAGE}
-      />
-
-      {filteredStories.length !== stories.length && (
-        <Box marginTop={1}>
-          <Text dimColor>Filtered from {stories.length} total</Text>
+    <Box width="100%" height="100%">
+      <Box flexDirection="column" padding={1}>
+        <Box marginBottom={1}>
+          <Text color="cyan" bold>🔥 Hacker News TUI - Sorted by {sortByComments ? 'Comments' : 'Date'}</Text>
         </Box>
-      )}
 
-      {modalOpen && selectedStory && (
-        <StoryModal
+        <Box marginBottom={1}>
+          <Text dimColor>
+            Use ↑/↓ arrows or j/k to navigate • gg to top • G to bottom • / to search • Enter for modal • 'v' for drawer • 'd' to remove • 'r' to refresh • 's' to sort • 'q' to quit
+          </Text>
+        </Box>
+
+        {searchMode && <SearchBox searchQuery={searchQuery} />}
+
+        <StoryList
+          stories={filteredStories}
+          selectedIndex={selectedIndex}
+          scrollOffset={scrollOffset}
+          storiesPerPage={STORIES_PER_PAGE}
+        />
+
+        {filteredStories.length !== stories.length && (
+          <Box marginTop={1}>
+            <Text dimColor>Filtered from {stories.length} total</Text>
+          </Box>
+        )}
+
+        {modalOpen && selectedStory && (
+          <StoryModal
+            selectedStory={selectedStory}
+            modalSelectedOption={modalSelectedOption}
+          />
+        )}
+      </Box>
+
+      {selectedStory && (
+        <StoryDrawer
           selectedStory={selectedStory}
-          modalSelectedOption={modalSelectedOption}
+          drawerSelectedOption={drawerSelectedOption}
+          isOpen={drawerOpen}
         />
       )}
     </Box>

@@ -15,8 +15,15 @@ HNTUI is a terminal-based Hacker News reader built with React using Ink for term
 
 ### Main Application Structure
 
-The entire application is contained in a single file (`index.jsx`) with the following key components:
+The application has been refactored into a modular component-based architecture:
 
+- **Entry Point**: `index.jsx` - Main application entry point and state management
+- **Components**: Modular React components in `/components/` directory:
+  - `Story.jsx` - Individual story display component
+  - `StoryList.jsx` - List container for stories
+  - `StoryModal.jsx` - Modal for story actions (comments/article links)
+  - `SearchBox.jsx` - Search input component
+  - `HelpMenu.jsx` - Help/controls display component
 - **State Management**: Uses React hooks for all state (stories, filtering, UI state, modal state)
 - **Story Data**: Fetches from Hacker News Firebase API (`https://hacker-news.firebaseio.com/v0/`)
 - **Persistent Storage**: Saves removed article IDs to `.removed-articles.json` file

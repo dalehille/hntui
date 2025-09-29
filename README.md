@@ -1,6 +1,6 @@
 # Hacker News TUI
 
-A terminal-based Hacker News reader built with React and Ink.
+A terminal-based Hacker News reader built with React, Ink, Cursor/Gemini/Claude.
 
 ## Features
 

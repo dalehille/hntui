@@ -316,6 +316,14 @@ function App() {
       // Main navigation
       if (input === 'q' || key.ctrl && input === 'c') {
         exit();
+      } else if (key.escape && tab.searchQuery) {
+        // Clear active search filter and restore full list
+        updateTab(activeTabIndex, {
+          searchQuery: '',
+          filteredStories: [...tab.stories],
+          selectedIndex: 0,
+          scrollOffset: 0,
+        });
       } else if ((input === 'h' || key.leftArrow) && tabs.length > 1) {
         // Switch to previous tab
         const newIndex = activeTabIndex === 0 ? tabs.length - 1 : activeTabIndex - 1;

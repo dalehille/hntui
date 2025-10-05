@@ -294,26 +294,50 @@ function App() {
       } else if (key.upArrow || input === 'k') {
         setModalSelectedOption(prev => Math.max(0, prev - 1));
       } else if (key.downArrow || input === 'j') {
-        setModalSelectedOption(prev => Math.min(2, prev + 1));
+        const story = selectedStory;
+        // Determine max options based on whether story has separate comments
+        const hasComments = story.source === 'hackernews' ||
+          (story.commentsUrl && story.commentsUrl !== story.url);
+        const maxOption = hasComments ? 2 : 1; // 3 options (0,1,2) or 2 options (0,1)
+        setModalSelectedOption(prev => Math.min(maxOption, prev + 1));
       } else if (key.return) {
         const story = selectedStory;
-        if (modalSelectedOption === 0) {
-          // Open comments URL
-          try {
-            open(story.commentsUrl);
-          } catch (error) {
-            console.log(`\nError opening comments URL: ${error.message}`);
+        const hasComments = story.source === 'hackernews' ||
+          (story.commentsUrl && story.commentsUrl !== story.url);
+
+        if (hasComments) {
+          // 3 options: comments, article URL, remove
+          if (modalSelectedOption === 0) {
+            // Open comments URL
+            try {
+              open(story.commentsUrl);
+            } catch (error) {
+              console.log(`\nError opening comments URL: ${error.message}`);
+            }
+          } else if (modalSelectedOption === 1 && story.url) {
+            // Open actual URL
+            try {
+              open(story.url);
+            } catch (error) {
+              console.log(`\nError opening URL: ${error.message}`);
+            }
+          } else if (modalSelectedOption === 2) {
+            removeArticle(story.id);
           }
-        } else if (modalSelectedOption === 1 && story.url) {
-          // Open actual URL
-          try {
-            open(story.url);
-          } catch (error) {
-            console.log(`\nError opening URL: ${error.message}`);
+        } else {
+          // 2 options: article URL, remove
+          if (modalSelectedOption === 0 && story.url) {
+            // Open article URL
+            try {
+              open(story.url);
+            } catch (error) {
+              console.log(`\nError opening URL: ${error.message}`);
+            }
+          } else if (modalSelectedOption === 1) {
+            removeArticle(story.id);
           }
-        } else if (modalSelectedOption === 2) {
-          removeArticle(story.id);
         }
+
         setModalOpen(false);
         setSelectedStory(null);
         setModalSelectedOption(0);

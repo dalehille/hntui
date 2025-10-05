@@ -5,6 +5,10 @@ import { ThemeContext } from '../index.jsx';
 const StoryModal = ({ selectedStory, modalSelectedOption }) => {
   const { colors } = useContext(ThemeContext);
 
+  // Determine if this source has separate comments (e.g., HN does, blogs don't)
+  const hasComments = selectedStory.source === 'hackernews' ||
+    (selectedStory.commentsUrl && selectedStory.commentsUrl !== selectedStory.url);
+
   return (
     <Box
       position="absolute"
@@ -19,30 +23,33 @@ const StoryModal = ({ selectedStory, modalSelectedOption }) => {
       flexDirection="column"
     >
       <Box marginBottom={2}>
-        <Text color={colors.primary} bold>Choose URL to open:</Text>
+        <Text color={colors.primary} bold>Choose action:</Text>
       </Box>
 
       <Box flexDirection="column" marginBottom={2}>
-        <Box
-          backgroundColor={modalSelectedOption === 0 ? colors.accent : undefined}
-          paddingX={1}
-          paddingY={0.5}
-        >
-          <Text color={modalSelectedOption === 0 ? colors.foreground : undefined}>
-            1. Open comments
-          </Text>
-        </Box>
+        {hasComments && (
+          <Box
+            backgroundColor={modalSelectedOption === 0 ? colors.accent : undefined}
+            paddingX={1}
+            paddingY={0.5}
+          >
+            <Text color={modalSelectedOption === 0 ? colors.foreground : undefined}>
+              1. Open comments
+            </Text>
+          </Box>
+        )}
 
         <Box
-          backgroundColor={modalSelectedOption === 1 ? colors.accent : undefined}
+          backgroundColor={modalSelectedOption === (hasComments ? 1 : 0) ? colors.accent : undefined}
           paddingX={1}
           paddingY={0.5}
           flexDirection="column"
         >
-          <Text color={modalSelectedOption === 1 ? colors.foreground : undefined}>
-            {selectedStory.url ? '2. Open article URL' : '2. No external URL available'}
+          <Text color={modalSelectedOption === (hasComments ? 1 : 0) ? colors.foreground : undefined}>
+            {hasComments ? '2. ' : '1. '}
+            {selectedStory.url ? 'Open article URL' : 'No external URL available'}
           </Text>
-          {selectedStory.url && modalSelectedOption === 1 && (
+          {selectedStory.url && modalSelectedOption === (hasComments ? 1 : 0) && (
             <Text color={colors.foreground} dimColor={colors.dim}>
               {selectedStory.url}
             </Text>
@@ -50,12 +57,12 @@ const StoryModal = ({ selectedStory, modalSelectedOption }) => {
         </Box>
 
         <Box
-          backgroundColor={modalSelectedOption === 2 ? colors.accent : undefined}
+          backgroundColor={modalSelectedOption === (hasComments ? 2 : 1) ? colors.accent : undefined}
           paddingX={1}
           paddingY={0.5}
         >
-          <Text color={modalSelectedOption === 2 ? colors.foreground : undefined}>
-            3. Remove from list
+          <Text color={modalSelectedOption === (hasComments ? 2 : 1) ? colors.foreground : undefined}>
+            {hasComments ? '3. ' : '2. '}Remove from list
           </Text>
         </Box>
       </Box>

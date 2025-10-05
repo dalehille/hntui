@@ -37,7 +37,7 @@ function App() {
   const { exit } = useApp();
 
   const STORIES_PER_PAGE = 15;
-  const MAX_STORIES = 300;
+  const MAX_STORIES = 100;
 
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
@@ -123,7 +123,6 @@ function App() {
     }
   };
 
-  // Load sample data for development
   const loadSampleData = () => {
     try {
       const sampleDataPath = path.join(__dirname, 'sample-data.json');
@@ -143,6 +142,45 @@ function App() {
     initializeApp();
   }, []);
 
+  const fetchStoryWithRetry = async (id, maxRetries = 3) => {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const response = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return await response.json();
+      } catch (error) {
+        // If it's the last attempt, throw the error
+        if (attempt === maxRetries - 1) {
+          console.error(`Failed to fetch story ${id} after ${maxRetries} attempts:`, error.message);
+          return null;
+        }
+        // Exponential backoff: wait 100ms, 200ms, 400ms, etc.
+        await new Promise(resolve => setTimeout(resolve, 100 * Math.pow(2, attempt)));
+      }
+    }
+  };
+
+  // Fetch stories in batches to avoid overwhelming the connection
+  const fetchStoriesInBatches = async (storyIds, batchSize = 25) => {
+    const results = [];
+
+    for (let i = 0; i < storyIds.length; i += batchSize) {
+      const batch = storyIds.slice(i, i + batchSize);
+      const batchPromises = batch.map(id => fetchStoryWithRetry(id));
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults);
+
+      // Small delay between batches to avoid connection issues
+      if (i + batchSize < storyIds.length) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+    }
+
+    return results;
+  };
+
   const fetchStoriesWithRemoved = async (removedIds = removedStoryIds) => {
     try {
       setLoading(true);
@@ -160,12 +198,7 @@ function App() {
       const topStoriesResponse = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
       const topStoryIds = await topStoriesResponse.json();
 
-      const storyPromises = topStoryIds.slice(0, MAX_STORIES).map(async (id) => {
-        const response = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
-        return response.json();
-      });
-
-      const storyDetails = await Promise.all(storyPromises);
+      const storyDetails = await fetchStoriesInBatches(topStoryIds.slice(0, MAX_STORIES));
 
       const validStories = storyDetails
         .filter(story => story && !story.deleted && !story.dead && (story.descendants || 0) >= 50);
@@ -182,7 +215,6 @@ function App() {
     }
   };
 
-  // Filter stories based on search query
   const filterStories = (query) => {
     if (!query.trim()) {
       setFilteredStories(sortStories(stories, sortByComments));
@@ -197,7 +229,6 @@ function App() {
     setFilteredStories(sortStories(filtered, sortByComments));
   };
 
-  // Handle scroll and selection logic
   const updateScrollAndSelection = (newSelectedIndex) => {
     const maxIndex = filteredStories.length - 1;
     const clampedIndex = Math.max(0, Math.min(newSelectedIndex, maxIndex));

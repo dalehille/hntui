@@ -49,7 +49,7 @@ function App() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [gKeySequence, setGKeySequence] = useState('');
 
-  const { colors } = useContext(ThemeContext);
+  const { colors, setTheme } = useContext(ThemeContext);
   const { exit } = useApp();
 
   const STORIES_PER_PAGE = 15;
@@ -275,7 +275,8 @@ function App() {
 
     if (tab.searchMode) {
       // Search mode - handle search input
-      if (input === 'q' || key.ctrl && input === 'c') {
+      // Only Ctrl+C should exit the app in search mode
+      if (key.ctrl && input === 'c') {
         exit();
       } else if (key.escape) {
         // Exit search mode and clear filter
@@ -414,6 +415,10 @@ function App() {
           console.log(`\nError opening URL: ${error.message}`);
         }
         setGKeySequence('');
+      } else if (input === 't') {
+        // Toggle theme
+        setTheme(currentTheme => (currentTheme === 'dark' ? 'light' : 'dark'));
+        setGKeySequence('');
       } else {
         // Reset 'g' sequence for any other key
         setGKeySequence('');
@@ -498,12 +503,6 @@ function ThemeProvider({ children }) {
   };
   const [themeName, setThemeName] = useState('dark');
   const theme = themes[themeName];
-
-  useInput((input, key) => {
-    if (input === 't') {
-      setThemeName(currentThemeName => (currentThemeName === 'dark' ? 'light' : 'dark'));
-    }
-  });
 
   const themeApi = {
     theme,

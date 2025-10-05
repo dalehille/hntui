@@ -56,11 +56,14 @@ const Story = ({ story, index, isSelected }) => {
 
         <Box>
           <Text color={isSelected ? textColor : colors.dim} dimColor={!isSelected}>
-            {story.score || 0} points by {story.by} {formatTime(story.time)}
+            {story.score > 0 && `${story.score} points • `}
+            {story.author} • {formatTime(story.date)}
           </Text>
-          <Text color={isSelected ? textColor : colors.error} dimColor={!isSelected}>
-            {' '}| {story.descendants || 0} comments
-          </Text>
+          {story.commentsCount > 0 && (
+            <Text color={isSelected ? textColor : colors.error} dimColor={!isSelected}>
+              {' '}• {story.commentsCount} comments
+            </Text>
+          )}
         </Box>
       </Box>
     </Box>

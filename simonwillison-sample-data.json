@@ -1,0 +1,322 @@
+[
+    {
+        "id": "https://simonwillison.net/2024/Oct/5/llm-plugins/",
+        "title": "Building plugins for LLM",
+        "url": "https://simonwillison.net/2024/Oct/5/llm-plugins/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Oct/5/llm-plugins/",
+        "commentsCount": 0,
+        "date": 1728129600,
+        "metadata": {
+            "summary": "I've been building plugins for my LLM tool, which provides a command-line interface for working with Large Language Models.",
+            "published": "2024-10-05T10:00:00Z",
+            "updated": "2024-10-05T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Oct/4/weeknotes/",
+        "title": "Weeknotes: more prompt caching and embeddings research",
+        "url": "https://simonwillison.net/2024/Oct/4/weeknotes/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Oct/4/weeknotes/",
+        "commentsCount": 0,
+        "date": 1728043200,
+        "metadata": {
+            "summary": "This week I've been exploring prompt caching and embeddings for various AI applications.",
+            "published": "2024-10-04T10:00:00Z",
+            "updated": "2024-10-04T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Oct/3/not-digital-god/",
+        "title": "You can't be a digital god",
+        "url": "https://simonwillison.net/2024/Oct/3/not-digital-god/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Oct/3/not-digital-god/",
+        "commentsCount": 0,
+        "date": 1727956800,
+        "metadata": {
+            "summary": "Reflections on the limits of control and the hubris of thinking you can control everything in software systems.",
+            "published": "2024-10-03T10:00:00Z",
+            "updated": "2024-10-03T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Oct/2/files-to-prompt/",
+        "title": "files-to-prompt: a tool for preparing files for LLM input",
+        "url": "https://simonwillison.net/2024/Oct/2/files-to-prompt/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Oct/2/files-to-prompt/",
+        "commentsCount": 0,
+        "date": 1727870400,
+        "metadata": {
+            "summary": "A command-line tool that helps prepare multiple files for use as context in LLM conversations.",
+            "published": "2024-10-02T10:00:00Z",
+            "updated": "2024-10-02T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Oct/1/datasette-enrichments/",
+        "title": "Datasette Enrichments: a new plugin framework",
+        "url": "https://simonwillison.net/2024/Oct/1/datasette-enrichments/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Oct/1/datasette-enrichments/",
+        "commentsCount": 0,
+        "date": 1727784000,
+        "metadata": {
+            "summary": "Introducing a new plugin framework for Datasette that allows you to enrich data in your tables.",
+            "published": "2024-10-01T10:00:00Z",
+            "updated": "2024-10-01T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/30/understanding-system-prompts/",
+        "title": "Understanding LLM system prompts",
+        "url": "https://simonwillison.net/2024/Sep/30/understanding-system-prompts/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/30/understanding-system-prompts/",
+        "commentsCount": 0,
+        "date": 1727697600,
+        "metadata": {
+            "summary": "A deep dive into how system prompts work in Large Language Models and how to use them effectively.",
+            "published": "2024-09-30T10:00:00Z",
+            "updated": "2024-09-30T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/29/ai-agents-autonomous/",
+        "title": "Why AI agents are not going to be autonomous any time soon",
+        "url": "https://simonwillison.net/2024/Sep/29/ai-agents-autonomous/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsCount": 0,
+        "commentsUrl": "https://simonwillison.net/2024/Sep/29/ai-agents-autonomous/",
+        "date": 1727611200,
+        "metadata": {
+            "summary": "Thoughts on the current state of AI agents and why full autonomy is still far off.",
+            "published": "2024-09-29T10:00:00Z",
+            "updated": "2024-09-29T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/28/sqlite-http-extension/",
+        "title": "The SQLite HTTP extension",
+        "url": "https://simonwillison.net/2024/Sep/28/sqlite-http-extension/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/28/sqlite-http-extension/",
+        "commentsCount": 0,
+        "date": 1727524800,
+        "metadata": {
+            "summary": "Exploring the SQLite HTTP extension which allows you to make HTTP requests directly from SQL queries.",
+            "published": "2024-09-28T10:00:00Z",
+            "updated": "2024-09-28T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/27/anthropic-prompt-caching/",
+        "title": "Anthropic's prompt caching is a game changer",
+        "url": "https://simonwillison.net/2024/Sep/27/anthropic-prompt-caching/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/27/anthropic-prompt-caching/",
+        "commentsCount": 0,
+        "date": 1727438400,
+        "metadata": {
+            "summary": "Anthropic's new prompt caching feature can dramatically reduce costs and latency for LLM applications.",
+            "published": "2024-09-27T10:00:00Z",
+            "updated": "2024-09-27T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/26/django-sql-dashboard-2/",
+        "title": "Django SQL Dashboard 2.0",
+        "url": "https://simonwillison.net/2024/Sep/26/django-sql-dashboard-2/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/26/django-sql-dashboard-2/",
+        "commentsCount": 0,
+        "date": 1727352000,
+        "metadata": {
+            "summary": "Announcing version 2.0 of Django SQL Dashboard with new features and improvements.",
+            "published": "2024-09-26T10:00:00Z",
+            "updated": "2024-09-26T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/25/python-rust-bindings/",
+        "title": "Building Python extensions in Rust using PyO3",
+        "url": "https://simonwillison.net/2024/Sep/25/python-rust-bindings/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/25/python-rust-bindings/",
+        "commentsCount": 0,
+        "date": 1727265600,
+        "metadata": {
+            "summary": "A guide to creating high-performance Python extensions using Rust and the PyO3 framework.",
+            "published": "2024-09-25T10:00:00Z",
+            "updated": "2024-09-25T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/24/weeknotes-datasette-ai/",
+        "title": "Weeknotes: Datasette and AI experiments",
+        "url": "https://simonwillison.net/2024/Sep/24/weeknotes-datasette-ai/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/24/weeknotes-datasette-ai/",
+        "commentsCount": 0,
+        "date": 1727179200,
+        "metadata": {
+            "summary": "This week's updates on Datasette development and various AI experiments I've been running.",
+            "published": "2024-09-24T10:00:00Z",
+            "updated": "2024-09-24T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/23/git-history/",
+        "title": "git-history: a tool for analyzing Git history",
+        "url": "https://simonwillison.net/2024/Sep/23/git-history/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/23/git-history/",
+        "commentsCount": 0,
+        "date": 1727092800,
+        "metadata": {
+            "summary": "A new tool for tracking changes to a file over time using Git history and storing results in SQLite.",
+            "published": "2024-09-23T10:00:00Z",
+            "updated": "2024-09-23T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/22/embeddings-tutorial/",
+        "title": "A practical introduction to embeddings",
+        "url": "https://simonwillison.net/2024/Sep/22/embeddings-tutorial/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/22/embeddings-tutorial/",
+        "commentsCount": 0,
+        "date": 1727006400,
+        "metadata": {
+            "summary": "Learn how to use embeddings for semantic search and similarity comparisons in your applications.",
+            "published": "2024-09-22T10:00:00Z",
+            "updated": "2024-09-22T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/21/shot-scraper-updates/",
+        "title": "Shot-scraper updates: new features and improvements",
+        "url": "https://simonwillison.net/2024/Sep/21/shot-scraper-updates/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/21/shot-scraper-updates/",
+        "commentsCount": 0,
+        "date": 1726920000,
+        "metadata": {
+            "summary": "New updates to shot-scraper, my tool for taking automated screenshots of web pages.",
+            "published": "2024-09-21T10:00:00Z",
+            "updated": "2024-09-21T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/20/llm-embeddings-models/",
+        "title": "Comparing embedding models for semantic search",
+        "url": "https://simonwillison.net/2024/Sep/20/llm-embeddings-models/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/20/llm-embeddings-models/",
+        "commentsCount": 0,
+        "date": 1726833600,
+        "metadata": {
+            "summary": "An analysis of different embedding models and their performance for semantic search tasks.",
+            "published": "2024-09-20T10:00:00Z",
+            "updated": "2024-09-20T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/19/llm-cmd-tool/",
+        "title": "Using LLMs from the command line",
+        "url": "https://simonwillison.net/2024/Sep/19/llm-cmd-tool/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/19/llm-cmd-tool/",
+        "commentsCount": 0,
+        "date": 1726747200,
+        "metadata": {
+            "summary": "How I use my LLM command-line tool for everyday tasks and automation.",
+            "published": "2024-09-19T10:00:00Z",
+            "updated": "2024-09-19T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/18/ai-assisted-programming/",
+        "title": "AI-assisted programming is a paradigm shift",
+        "url": "https://simonwillison.net/2024/Sep/18/ai-assisted-programming/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/18/ai-assisted-programming/",
+        "commentsCount": 0,
+        "date": 1726660800,
+        "metadata": {
+            "summary": "Reflections on how AI tools are fundamentally changing the way we write and think about code.",
+            "published": "2024-09-18T10:00:00Z",
+            "updated": "2024-09-18T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/17/sqlite-vec/",
+        "title": "sqlite-vec: vector search for SQLite",
+        "url": "https://simonwillison.net/2024/Sep/17/sqlite-vec/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/17/sqlite-vec/",
+        "commentsCount": 0,
+        "date": 1726574400,
+        "metadata": {
+            "summary": "A new SQLite extension that brings vector search capabilities to SQLite databases.",
+            "published": "2024-09-17T10:00:00Z",
+            "updated": "2024-09-17T10:00:00Z"
+        }
+    },
+    {
+        "id": "https://simonwillison.net/2024/Sep/16/datasette-write-api/",
+        "title": "The Datasette write API",
+        "url": "https://simonwillison.net/2024/Sep/16/datasette-write-api/",
+        "source": "simonwillison",
+        "score": 0,
+        "author": "Simon Willison",
+        "commentsUrl": "https://simonwillison.net/2024/Sep/16/datasette-write-api/",
+        "commentsCount": 0,
+        "date": 1726488000,
+        "metadata": {
+            "summary": "Announcing the new write API for Datasette, allowing programmatic updates to your databases.",
+            "published": "2024-09-16T10:00:00Z",
+            "updated": "2024-09-16T10:00:00Z"
+        }
+    }
+]

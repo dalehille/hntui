@@ -38,6 +38,11 @@ const HelpMenu = () => {
                         <Text color={colors.foreground}>G</Text>
                         <Text dimColor={colors.dim}> - Go to bottom</Text>
                     </Box>
+
+                    <Box marginBottom={0}>
+                        <Text color={colors.foreground}>h/l or ←/→</Text>
+                        <Text dimColor={colors.dim}> - Switch tabs</Text>
+                    </Box>
                 </Box>
 
                 <Box marginBottom={0} marginTop={1}>
@@ -46,13 +51,8 @@ const HelpMenu = () => {
 
                 <Box flexDirection="column" marginLeft={2}>
                     <Box marginBottom={0}>
-                        <Text color={colors.foreground}>Enter</Text>
-                        <Text dimColor={colors.dim}> - Open modal</Text>
-                    </Box>
-
-                    <Box marginBottom={0}>
-                        <Text color={colors.foreground}>Space</Text>
-                        <Text dimColor={colors.dim}> - Open HN comments directly</Text>
+                        <Text color={colors.foreground}>Enter or Space</Text>
+                        <Text dimColor={colors.dim}> - Open the url</Text>
                     </Box>
 
                     <Box marginBottom={0}>

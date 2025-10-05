@@ -2,6 +2,8 @@
 
 A terminal-based content reader built with React and Ink. Browse stories from multiple sources including Hacker News and Simon Willison's blog in a unified, tabbed interface.
 
+![HNTUI Screenshot](screenshot.png)
+
 ## Features
 
 - **Multi-source content**: Browse stories from Hacker News and Simon Willison's blog

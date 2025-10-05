@@ -23,7 +23,6 @@ The application uses a modular, multi-source architecture:
   - `Tabs.jsx` - Displays and manages the different data source tabs.
   - `Story.jsx` - Individual story display component.
   - `StoryList.jsx` - List container for stories.
-  - `StoryModal.jsx` - Source-aware modal for story actions (opens comments/article links or removes from list).
   - `SearchBox.jsx` - Search input component.
   - `HelpMenu.jsx` - Help/controls display component.
 - **Data Sources**: Logic for fetching and parsing data from different sources in the `/sources/` directory:
@@ -48,11 +47,8 @@ The application uses a modular, multi-source architecture:
 5.  **UI Navigation**: 
     - Story navigation: Vim-like keybindings (`j`/`k`, `gg`, `G`) plus arrow keys
     - Tab switching: `h`/`l` or arrow keys (left/right)
-    - Quick access: Spacebar opens comments/article directly
-6.  **Source-Aware Modal**: 
-    - HN stories: 3 options (open comments, open article, remove)
-    - Blog posts: 2 options (open article, remove)
-    - Modal adapts based on content type
+    - Quick access: Enter or Spacebar opens the appropriate link (HN comments or article URL)
+    - Quick removal: `d` key removes article from list
 
 ### Data Flow
 
@@ -91,8 +87,6 @@ All sources map their data to this format:
   - `loading`, `error`
   - `sourceFetcher` (function reference)
 - `activeTabIndex`: Index of the currently active tab
-- `modalOpen`: Whether the story action modal is displayed
-- `selectedStory`: Currently selected story for modal actions
 - `helpOpen`: Whether the help menu is displayed
 
 ### File System Usage
@@ -155,4 +149,4 @@ To add a new data source:
    ]);
    ```
 
-The UI, modal, navigation, and all features will work automatically!
+The UI, navigation, and all features will work automatically!

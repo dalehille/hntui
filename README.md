@@ -1,15 +1,16 @@
-# Hacker News TUI
+# HNTUI
 
-A terminal-based Hacker News reader built with React, Ink, Cursor/Gemini/Claude.
+A terminal-based content reader built with React and Ink. Browse stories from multiple sources including Hacker News and Simon Willison's blog in a unified, tabbed interface.
 
 ## Features
 
-- Browse top Hacker News stories in your terminal
-- Search and filter stories
-- Sort by comments or date
-- Open stories in browser
-- Remove stories from your view
-- Real-time navigation with keyboard shortcuts
+- **Multi-source content**: Browse stories from Hacker News and Simon Willison's blog
+- **Tabbed interface**: Switch between different content sources
+- **Search and filter**: Find stories across all sources
+- **Flexible sorting**: Sort by comments or date (per source)
+- **Quick access**: Open stories and comments in your browser
+- **Persistent filtering**: Remove stories from your view
+- **Real-time navigation**: Vim-like keyboard shortcuts
 
 ## Installation
 
@@ -19,41 +20,44 @@ npm install
 
 ## Usage
 
+### Production Mode (with real API calls)
+```bash
+npm start
+```
+
+This will fetch real data from all configured sources (Hacker News and Simon Willison's blog).
+
+
 ### Development Mode (with sample data and auto-restart)
 ```bash
 npm run dev
 ```
 
 This will:
-- Load sample data from `sample-data.json` instead of making API calls to Hacker News
+- Load sample data from `sample-data.json` and `simonwillison-sample-data.json` instead of making API calls
 - Automatically restart the app when you make changes to any file
 - Perfect for development and testing without hitting rate limits
 
-### Production Mode (with real API calls)
-```bash
-npm start
-```
-
-This will fetch real data from the Hacker News API.
 
 ## Keyboard Shortcuts
 
 - `↑/↓` or `j/k` - Navigate stories
+- `←/→` or `h/l` - Switch between tabs
 - `gg` - Go to top
 - `G` - Go to bottom
 - `/` - Search mode
-- `Enter` - Open story modal
-- `v` - Open story drawer
+- `Enter` or `Space` - Open story/comments in browser
 - `d` - Remove current story
 - `r` - Refresh stories
 - `s` - Toggle sort (comments/date)
+- `?` - Show help
 - `q` - Quit
 
 ## Development
 
 The app includes sample data for faster development iteration. When running `npm run dev`, the app will:
 
-- Use sample data from `sample-data.json` instead of making API calls to Hacker News
+- Use sample data from `sample-data.json` and `simonwillison-sample-data.json` instead of making API calls
 - Automatically restart when you save changes to any file (thanks to Bun's `--watch` flag)
 - Provide instant feedback as you develop
 
@@ -66,4 +70,8 @@ The app includes sample data for faster development iteration. When running `npm
 
 ### Updating Sample Data
 
-To update the sample data, edit the `sample-data.json` file with realistic Hacker News story data. The app will automatically restart when you save the file.
+To update the sample data, edit the respective JSON files:
+- `sample-data.json` - Hacker News stories
+- `simonwillison-sample-data.json` - Simon Willison blog posts
+
+The app will automatically restart when you save any file.

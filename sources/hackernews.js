@@ -89,9 +89,10 @@ const mapToStandardFormat = (hnStory) => {
 /**
  * Fetch Hacker News stories
  * @param {Set} removedIds - Set of story IDs to exclude
+ * @param {Object} options - Options object (for API consistency, not currently used)
  * @returns {Promise<Array>} Array of stories in standard format
  */
-export const fetchStories = async (removedIds = new Set()) => {
+export const fetchStories = async (removedIds = new Set(), options = {}) => {
     try {
         // Use sample data in development mode
         if (process.env.NODE_ENV === 'development') {

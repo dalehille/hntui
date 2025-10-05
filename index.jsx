@@ -192,7 +192,7 @@ function App() {
   };
 
   // Fetch data for a specific tab
-  const fetchDataForTab = async (tabIndex) => {
+  const fetchDataForTab = async (tabIndex, options = {}) => {
     const tab = tabs[tabIndex];
     try {
       updateTab(tabIndex, { loading: true, error: null });
@@ -201,7 +201,7 @@ function App() {
       const removedIds = loadRemovedArticles(tab.id);
 
       // Fetch stories from the source
-      const fetchedStories = await tab.sourceFetcher(removedIds);
+      const fetchedStories = await tab.sourceFetcher(removedIds, options);
 
       // Sort stories
       const sortedStories = sortStories(fetchedStories, tab.sortByComments, tab.sortDateAscending);
@@ -340,8 +340,8 @@ function App() {
         setActiveTabIndex(newIndex);
         setGKeySequence('');
       } else if (input === 'r') {
-        // Refresh stories for current tab
-        fetchDataForTab(activeTabIndex);
+        // Refresh stories for current tab (force refresh to bypass cache)
+        fetchDataForTab(activeTabIndex, { forceRefresh: true });
         updateTab(activeTabIndex, {
           selectedIndex: 0,
           scrollOffset: 0,

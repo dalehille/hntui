@@ -152,9 +152,13 @@ const fetchAtomFeed = async () => {
 /**
  * Fetch stories from Simon Willison's blog
  * @param {Set} removedIds - Set of story IDs to exclude
+ * @param {Object} options - Options object
+ * @param {boolean} options.forceRefresh - If true, bypass cache and fetch fresh data
  * @returns {Promise<Array>} Array of stories in standard format
  */
-export const fetchStories = async (removedIds = new Set()) => {
+export const fetchStories = async (removedIds = new Set(), options = {}) => {
+    const { forceRefresh = false } = options;
+
     try {
         // Use sample data in development mode
         if (process.env.NODE_ENV === 'development') {
@@ -163,8 +167,8 @@ export const fetchStories = async (removedIds = new Set()) => {
             return storiesWithoutRemoved;
         }
 
-        // Check cache first
-        if (isCacheFresh()) {
+        // Check cache first (unless force refresh is requested)
+        if (!forceRefresh && isCacheFresh()) {
             const cachedData = loadCache();
             if (cachedData) {
                 const storiesWithoutRemoved = cachedData.filter(story => !removedIds.has(story.id));

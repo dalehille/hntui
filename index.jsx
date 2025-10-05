@@ -8,7 +8,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import StoryList from './components/StoryList.jsx';
 import SearchBox from './components/SearchBox.jsx';
-import StoryModal from './components/StoryModal.jsx';
 import HelpMenu from './components/HelpMenu.jsx';
 import Tabs from './components/Tabs.jsx';
 import * as HackerNews from './sources/hackernews.js';
@@ -43,10 +42,7 @@ function App() {
     createTab('simonwillison', 'Simon Willison', SimonWillison.fetchStories),
   ]);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const [modalOpen, setModalOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
-  const [selectedStory, setSelectedStory] = useState(null);
-  const [modalSelectedOption, setModalSelectedOption] = useState(0);
   const [gKeySequence, setGKeySequence] = useState('');
 
   const { colors } = useContext(ThemeContext);
@@ -283,65 +279,6 @@ function App() {
         updateTab(activeTabIndex, { searchQuery: newQuery });
         filterStories(newQuery);
       }
-    } else if (modalOpen) {
-      // Modal is open - handle modal navigation
-      if (input === 'q' || key.ctrl && input === 'c') {
-        exit();
-      } else if (key.escape) {
-        setModalOpen(false);
-        setSelectedStory(null);
-        setModalSelectedOption(0);
-      } else if (key.upArrow || input === 'k') {
-        setModalSelectedOption(prev => Math.max(0, prev - 1));
-      } else if (key.downArrow || input === 'j') {
-        const story = selectedStory;
-        // Determine max options based on whether story has separate comments
-        const hasComments = story.source === 'hackernews' ||
-          (story.commentsUrl && story.commentsUrl !== story.url);
-        const maxOption = hasComments ? 2 : 1; // 3 options (0,1,2) or 2 options (0,1)
-        setModalSelectedOption(prev => Math.min(maxOption, prev + 1));
-      } else if (key.return) {
-        const story = selectedStory;
-        const hasComments = story.source === 'hackernews' ||
-          (story.commentsUrl && story.commentsUrl !== story.url);
-
-        if (hasComments) {
-          // 3 options: comments, article URL, remove
-          if (modalSelectedOption === 0) {
-            // Open comments URL
-            try {
-              open(story.commentsUrl);
-            } catch (error) {
-              console.log(`\nError opening comments URL: ${error.message}`);
-            }
-          } else if (modalSelectedOption === 1 && story.url) {
-            // Open actual URL
-            try {
-              open(story.url);
-            } catch (error) {
-              console.log(`\nError opening URL: ${error.message}`);
-            }
-          } else if (modalSelectedOption === 2) {
-            removeArticle(story.id);
-          }
-        } else {
-          // 2 options: article URL, remove
-          if (modalSelectedOption === 0 && story.url) {
-            // Open article URL
-            try {
-              open(story.url);
-            } catch (error) {
-              console.log(`\nError opening URL: ${error.message}`);
-            }
-          } else if (modalSelectedOption === 1) {
-            removeArticle(story.id);
-          }
-        }
-
-        setModalOpen(false);
-        setSelectedStory(null);
-        setModalSelectedOption(0);
-      }
     } else if (helpOpen) {
       // Help menu is open - handle help menu navigation
       if (input === 'q' || key.ctrl && input === 'c') {
@@ -420,19 +357,16 @@ function App() {
         const story = tab.filteredStories[tab.selectedIndex];
         removeArticle(story.id);
         setGKeySequence('');
-      } else if (key.return && tab.filteredStories[tab.selectedIndex]) {
+      } else if ((key.return || input === ' ') && tab.filteredStories[tab.selectedIndex]) {
+        // Open the appropriate URL: HN comments page, or article URL for other sources
         const story = tab.filteredStories[tab.selectedIndex];
-        setSelectedStory(story);
-        setModalOpen(true);
-        setModalSelectedOption(0);
-        setGKeySequence('');
-      } else if (input === ' ' && tab.filteredStories[tab.selectedIndex]) {
-        // Open comments page directly with spacebar
-        const story = tab.filteredStories[tab.selectedIndex];
+        const urlToOpen = story.source === 'hackernews' ? story.commentsUrl : story.url;
         try {
-          open(story.commentsUrl);
+          if (urlToOpen) {
+            open(urlToOpen);
+          }
         } catch (error) {
-          console.log(`\nError opening comments URL: ${error.message}`);
+          console.log(`\nError opening URL: ${error.message}`);
         }
         setGKeySequence('');
       } else {
@@ -488,13 +422,6 @@ function App() {
           <Box marginTop={1}>
             <Text dimColor={colors.dim}>Filtered from {activeTab.stories.length} total</Text>
           </Box>
-        )}
-
-        {modalOpen && selectedStory && (
-          <StoryModal
-            selectedStory={selectedStory}
-            modalSelectedOption={modalSelectedOption}
-          />
         )}
 
         {helpOpen && <HelpMenu />}

@@ -51,13 +51,8 @@ const HelpMenu = () => {
 
                 <Box flexDirection="column" marginLeft={2}>
                     <Box marginBottom={0}>
-                        <Text color={colors.foreground}>Enter</Text>
-                        <Text dimColor={colors.dim}> - Open modal</Text>
-                    </Box>
-
-                    <Box marginBottom={0}>
-                        <Text color={colors.foreground}>Space</Text>
-                        <Text dimColor={colors.dim}> - Open comments directly</Text>
+                        <Text color={colors.foreground}>Enter or Space</Text>
+                        <Text dimColor={colors.dim}> - Open the url</Text>
                     </Box>
 
                     <Box marginBottom={0}>

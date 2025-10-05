@@ -14,7 +14,7 @@ const StoryModal = ({ selectedStory, modalSelectedOption }) => {
       position="absolute"
       top="50%"
       left="50%"
-      width="80%"
+      width="90%"
       height="40%"
       borderStyle="round"
       borderColor={colors.primary}
@@ -49,7 +49,7 @@ const StoryModal = ({ selectedStory, modalSelectedOption }) => {
             {hasComments ? '2. ' : '1. '}
             {selectedStory.url ? 'Open article URL' : 'No external URL available'}
           </Text>
-          {selectedStory.url && modalSelectedOption === (hasComments ? 1 : 0) && (
+          {selectedStory.url && (
             <Text color={colors.foreground} dimColor={colors.dim}>
               {selectedStory.url}
             </Text>

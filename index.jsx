@@ -31,16 +31,20 @@ const createTab = (sourceId, sourceName, sourceFetcher) => {
     searchMode: false,
     searchQuery: '',
     sortByComments: true,
+    sortDateAscending: false, // false = newest first (descending), true = oldest first (ascending)
     removedStoryIds: new Set(),
     sourceFetcher,
   };
 };
 
 function App() {
-  const [tabs, setTabs] = useState([
-    createTab('hackernews', 'Hacker News', HackerNews.fetchStories),
-    createTab('simonwillison', 'Simon Willison', SimonWillison.fetchStories),
-  ]);
+  const [tabs, setTabs] = useState(() => {
+    const hnTab = createTab('hackernews', 'Hacker News', HackerNews.fetchStories);
+    const swTab = createTab('simonwillison', 'Simon Willison', SimonWillison.fetchStories);
+    // Simon Willison tab should default to sorting by date (not comments)
+    swTab.sortByComments = false;
+    return [hnTab, swTab];
+  });
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [helpOpen, setHelpOpen] = useState(false);
   const [gKeySequence, setGKeySequence] = useState('');
@@ -62,16 +66,37 @@ function App() {
   };
 
   // Sort stories based on sort mode
-  const sortStories = (stories, sortByCommentsMode) => {
+  const sortStories = (stories, sortByCommentsMode, sortDateAscendingMode = false) => {
     return [...stories].sort((a, b) => {
       if (sortByCommentsMode) {
         // Sort by comment count (descending)
         return (b.commentsCount || 0) - (a.commentsCount || 0);
       } else {
-        // Sort by date (descending - newest first)
-        return (b.date || 0) - (a.date || 0);
+        // Sort by date
+        if (sortDateAscendingMode) {
+          // Ascending - oldest first
+          return (a.date || 0) - (b.date || 0);
+        } else {
+          // Descending - newest first
+          return (b.date || 0) - (a.date || 0);
+        }
       }
     });
+  };
+
+  // Get display text for current sort mode
+  const getSortDisplayText = (tab) => {
+    if (tab.id === 'simonwillison') {
+      // Simon Willison only has date sorting
+      return tab.sortDateAscending ? 'Date (Oldest First)' : 'Date (Newest First)';
+    } else {
+      // Other tabs (like Hacker News) can sort by comments or date
+      if (tab.sortByComments) {
+        return 'Comments';
+      } else {
+        return 'Date (Newest First)';
+      }
+    }
   };
 
   // Update a specific tab
@@ -179,7 +204,7 @@ function App() {
       const fetchedStories = await tab.sourceFetcher(removedIds);
 
       // Sort stories
-      const sortedStories = sortStories(fetchedStories, tab.sortByComments);
+      const sortedStories = sortStories(fetchedStories, tab.sortByComments, tab.sortDateAscending);
 
       updateTab(tabIndex, {
         stories: sortedStories,
@@ -211,7 +236,7 @@ function App() {
     const tab = activeTab;
     if (!query.trim()) {
       updateTab(activeTabIndex, {
-        filteredStories: sortStories(tab.stories, tab.sortByComments),
+        filteredStories: sortStories(tab.stories, tab.sortByComments, tab.sortDateAscending),
       });
       return;
     }
@@ -222,7 +247,7 @@ function App() {
       (story.url && story.url.toLowerCase().includes(query.toLowerCase()))
     );
     updateTab(activeTabIndex, {
-      filteredStories: sortStories(filtered, tab.sortByComments),
+      filteredStories: sortStories(filtered, tab.sortByComments, tab.sortDateAscending),
     });
   };
 
@@ -300,6 +325,11 @@ function App() {
         const newIndex = activeTabIndex === tabs.length - 1 ? 0 : activeTabIndex + 1;
         setActiveTabIndex(newIndex);
         setGKeySequence('');
+      } else if (key.tab && tabs.length > 1) {
+        // Tab key - switch to next tab
+        const newIndex = activeTabIndex === tabs.length - 1 ? 0 : activeTabIndex + 1;
+        setActiveTabIndex(newIndex);
+        setGKeySequence('');
       } else if (input === 'r') {
         // Refresh stories for current tab
         fetchDataForTab(activeTabIndex);
@@ -308,17 +338,32 @@ function App() {
           scrollOffset: 0,
         });
       } else if (input === 's') {
-        // Toggle sort between comments and date
-        const newSortByComments = !tab.sortByComments;
-        const sortedStories = sortStories(tab.stories, newSortByComments);
-        const sortedFiltered = sortStories(tab.filteredStories, newSortByComments);
-        updateTab(activeTabIndex, {
-          sortByComments: newSortByComments,
-          stories: sortedStories,
-          filteredStories: sortedFiltered,
-          selectedIndex: 0,
-          scrollOffset: 0,
-        });
+        // Toggle sort - behavior depends on the tab
+        if (tab.id === 'simonwillison') {
+          // For Simon Willison tab, only toggle date sort direction
+          const newSortDateAscending = !tab.sortDateAscending;
+          const sortedStories = sortStories(tab.stories, false, newSortDateAscending);
+          const sortedFiltered = sortStories(tab.filteredStories, false, newSortDateAscending);
+          updateTab(activeTabIndex, {
+            sortDateAscending: newSortDateAscending,
+            stories: sortedStories,
+            filteredStories: sortedFiltered,
+            selectedIndex: 0,
+            scrollOffset: 0,
+          });
+        } else {
+          // For other tabs (like Hacker News), toggle between comments and date
+          const newSortByComments = !tab.sortByComments;
+          const sortedStories = sortStories(tab.stories, newSortByComments, tab.sortDateAscending);
+          const sortedFiltered = sortStories(tab.filteredStories, newSortByComments, tab.sortDateAscending);
+          updateTab(activeTabIndex, {
+            sortByComments: newSortByComments,
+            stories: sortedStories,
+            filteredStories: sortedFiltered,
+            selectedIndex: 0,
+            scrollOffset: 0,
+          });
+        }
         setGKeySequence('');
       } else if (input === '/') {
         // Enter search mode
@@ -381,7 +426,7 @@ function App() {
     return (
       <Box flexDirection="column" padding={1}>
         <Text color={colors.primary} bold>{activeTab.title}</Text>
-        <Text>Loading stories sorted by {activeTab.sortByComments ? 'comments' : 'date'}...</Text>
+        <Text>Loading stories sorted by {getSortDisplayText(activeTab)}...</Text>
       </Box>
     );
   }
@@ -405,7 +450,7 @@ function App() {
 
         <Box marginBottom={1}>
           <Text color={colors.primary} bold>
-            {activeTab.title} - Sorted by {activeTab.sortByComments ? 'Comments' : 'Date'}
+            {activeTab.title} - Sorted by {getSortDisplayText(activeTab)}
           </Text>
         </Box>
 

@@ -28,12 +28,6 @@ const Tabs = ({ tabs, activeTabIndex }) => {
                     </Box>
                 );
             })}
-
-            <Box marginLeft={2}>
-                <Text dimColor={colors.dim}>
-                    Use h/l or ←/→ to switch tabs
-                </Text>
-            </Box>
         </Box>
     );
 };

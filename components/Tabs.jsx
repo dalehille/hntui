@@ -15,7 +15,7 @@ const Tabs = ({ tabs, activeTabIndex }) => {
                         <Box
                             paddingX={2}
                             paddingY={0}
-                            borderStyle="round"
+                            borderStyle={isActive ? "double" : "single"}
                             borderColor={isActive ? colors.primary : colors.dim}
                         >
                             <Text

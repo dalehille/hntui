@@ -135,6 +135,9 @@ function App() {
   };
 
   useEffect(() => {
+    // Clear the terminal screen on initial mount
+    process.stdout.write('\x1b[2J\x1b[H');
+
     const initializeApp = async () => {
       const removedIds = loadRemovedArticles();
       await fetchStoriesWithRemoved(removedIds);

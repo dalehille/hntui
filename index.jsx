@@ -10,58 +10,90 @@ import StoryList from './components/StoryList.jsx';
 import SearchBox from './components/SearchBox.jsx';
 import StoryModal from './components/StoryModal.jsx';
 import HelpMenu from './components/HelpMenu.jsx';
+import Tabs from './components/Tabs.jsx';
+import * as HackerNews from './sources/hackernews.js';
+import * as SimonWillison from './sources/simonwillison.js';
 
 export const ThemeContext = createContext(null);
 
+/**
+ * Create a new tab structure
+ */
+const createTab = (sourceId, sourceName, sourceFetcher) => {
+  return {
+    id: sourceId,
+    title: sourceName,
+    stories: [],
+    filteredStories: [],
+    selectedIndex: 0,
+    scrollOffset: 0,
+    loading: true,
+    error: null,
+    searchMode: false,
+    searchQuery: '',
+    sortByComments: true,
+    removedStoryIds: new Set(),
+    sourceFetcher,
+  };
+};
+
 function App() {
-  const [stories, setStories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [scrollOffset, setScrollOffset] = useState(0);
-  const [error, setError] = useState(null);
+  const [tabs, setTabs] = useState([
+    createTab('hackernews', 'Hacker News', HackerNews.fetchStories),
+    createTab('simonwillison', 'Simon Willison', SimonWillison.fetchStories),
+  ]);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
   const [modalSelectedOption, setModalSelectedOption] = useState(0);
-  const [drawerSelectedOption, setDrawerSelectedOption] = useState(0);
   const [gKeySequence, setGKeySequence] = useState('');
-  const [searchMode, setSearchMode] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredStories, setFilteredStories] = useState([]);
-  const [removedStoryIds, setRemovedStoryIds] = useState(new Set());
-  const [sortByComments, setSortByComments] = useState(true);
 
   const { colors } = useContext(ThemeContext);
-
   const { exit } = useApp();
 
   const STORIES_PER_PAGE = 15;
-  const MAX_STORIES = 100;
 
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-  const removedArticlesPath = path.join(__dirname, '.removed-articles.json');
 
-  const sortStories = (stories, sortByCommentsMode = sortByComments) => {
+  // Get current active tab
+  const activeTab = tabs[activeTabIndex];
+
+  // Get removed articles path for a specific tab
+  const getRemovedArticlesPath = (tabId) => {
+    return path.join(__dirname, `.removed-articles-${tabId}.json`);
+  };
+
+  // Sort stories based on sort mode
+  const sortStories = (stories, sortByCommentsMode) => {
     return [...stories].sort((a, b) => {
       if (sortByCommentsMode) {
         // Sort by comment count (descending)
-        return (b.descendants || 0) - (a.descendants || 0);
+        return (b.commentsCount || 0) - (a.commentsCount || 0);
       } else {
         // Sort by date (descending - newest first)
-        return (b.time || 0) - (a.time || 0);
+        return (b.date || 0) - (a.date || 0);
       }
     });
   };
 
-  // Load removed article IDs from disk
-  const loadRemovedArticles = () => {
+  // Update a specific tab
+  const updateTab = (tabIndex, updates) => {
+    setTabs(prevTabs => {
+      const newTabs = [...prevTabs];
+      newTabs[tabIndex] = { ...newTabs[tabIndex], ...updates };
+      return newTabs;
+    });
+  };
+
+  // Load removed article IDs from disk for a specific tab
+  const loadRemovedArticles = (tabId) => {
     try {
+      const removedArticlesPath = getRemovedArticlesPath(tabId);
       if (fs.existsSync(removedArticlesPath)) {
         const data = fs.readFileSync(removedArticlesPath, 'utf8');
         const removedIds = JSON.parse(data);
-        setRemovedStoryIds(new Set(removedIds));
         return new Set(removedIds);
       }
       return new Set();
@@ -71,9 +103,10 @@ function App() {
     }
   };
 
-  // Save removed article IDs to disk
-  const saveRemovedArticles = (removedIds) => {
+  // Save removed article IDs to disk for a specific tab
+  const saveRemovedArticles = (tabId, removedIds) => {
     try {
+      const removedArticlesPath = getRemovedArticlesPath(tabId);
       const data = JSON.stringify(Array.from(removedIds));
       fs.writeFileSync(removedArticlesPath, data, 'utf8');
     } catch (error) {
@@ -83,54 +116,86 @@ function App() {
 
   // Remove an article from the list
   const removeArticle = (storyId) => {
-    const newRemovedIds = new Set(removedStoryIds);
+    const tab = activeTab;
+    const newRemovedIds = new Set(tab.removedStoryIds);
     newRemovedIds.add(storyId);
-    setRemovedStoryIds(newRemovedIds);
-    saveRemovedArticles(newRemovedIds);
+    saveRemovedArticles(tab.id, newRemovedIds);
 
     // Update the main stories list to remove the article
-    const updatedStories = stories.filter(story => story.id !== storyId);
-    setStories(updatedStories);
+    const updatedStories = tab.stories.filter(story => story.id !== storyId);
+
+    let updates = {
+      stories: updatedStories,
+      removedStoryIds: newRemovedIds,
+    };
 
     // If we're in search mode, re-apply the search filter
-    if (searchMode) {
-      // Re-filter the updated stories with the current search query
+    if (tab.searchMode) {
       const reFiltered = updatedStories.filter(story =>
-        story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (story.by && story.by.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (story.url && story.url.toLowerCase().includes(searchQuery.toLowerCase()))
+        story.title.toLowerCase().includes(tab.searchQuery.toLowerCase()) ||
+        (story.author && story.author.toLowerCase().includes(tab.searchQuery.toLowerCase())) ||
+        (story.url && story.url.toLowerCase().includes(tab.searchQuery.toLowerCase()))
       );
 
       // If the filtered list becomes empty after re-filtering, exit search mode
       if (reFiltered.length === 0) {
-        setSearchMode(false);
-        setSearchQuery('');
-        setFilteredStories([...updatedStories]);
-        setSelectedIndex(0);
-        setScrollOffset(0);
+        updates = {
+          ...updates,
+          searchMode: false,
+          searchQuery: '',
+          filteredStories: [...updatedStories],
+          selectedIndex: 0,
+          scrollOffset: 0,
+        };
       } else {
-        setFilteredStories(reFiltered);
-        if (selectedIndex >= reFiltered.length) {
-          setSelectedIndex(Math.max(0, reFiltered.length - 1));
-        }
+        updates = {
+          ...updates,
+          filteredStories: reFiltered,
+          selectedIndex: tab.selectedIndex >= reFiltered.length
+            ? Math.max(0, reFiltered.length - 1)
+            : tab.selectedIndex,
+        };
       }
     } else {
       // Not in search mode, just update filtered stories
-      setFilteredStories(updatedStories);
-      if (selectedIndex >= updatedStories.length) {
-        setSelectedIndex(Math.max(0, updatedStories.length - 1));
-      }
+      updates = {
+        ...updates,
+        filteredStories: updatedStories,
+        selectedIndex: tab.selectedIndex >= updatedStories.length
+          ? Math.max(0, updatedStories.length - 1)
+          : tab.selectedIndex,
+      };
     }
+
+    updateTab(activeTabIndex, updates);
   };
 
-  const loadSampleData = () => {
+  // Fetch data for a specific tab
+  const fetchDataForTab = async (tabIndex) => {
+    const tab = tabs[tabIndex];
     try {
-      const sampleDataPath = path.join(__dirname, 'sample-data.json');
-      const sampleData = JSON.parse(fs.readFileSync(sampleDataPath, 'utf8'));
-      return sampleData;
-    } catch (error) {
-      console.error('Error loading sample data:', error);
-      return [];
+      updateTab(tabIndex, { loading: true, error: null });
+
+      // Load removed articles for this tab
+      const removedIds = loadRemovedArticles(tab.id);
+
+      // Fetch stories from the source
+      const fetchedStories = await tab.sourceFetcher(removedIds);
+
+      // Sort stories
+      const sortedStories = sortStories(fetchedStories, tab.sortByComments);
+
+      updateTab(tabIndex, {
+        stories: sortedStories,
+        filteredStories: sortedStories,
+        removedStoryIds: removedIds,
+        loading: false,
+      });
+    } catch (err) {
+      updateTab(tabIndex, {
+        error: err.message,
+        loading: false,
+      });
     }
   };
 
@@ -138,141 +203,84 @@ function App() {
     // Clear the terminal screen on initial mount
     process.stdout.write('\x1b[2J\x1b[H');
 
-    const initializeApp = async () => {
-      const removedIds = loadRemovedArticles();
-      await fetchStoriesWithRemoved(removedIds);
-    };
-    initializeApp();
+    // Initialize all tabs
+    tabs.forEach((_, index) => {
+      fetchDataForTab(index);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchStoryWithRetry = async (id, maxRetries = 3) => {
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        const response = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        return await response.json();
-      } catch (error) {
-        // If it's the last attempt, throw the error
-        if (attempt === maxRetries - 1) {
-          console.error(`Failed to fetch story ${id} after ${maxRetries} attempts:`, error.message);
-          return null;
-        }
-        // Exponential backoff: wait 100ms, 200ms, 400ms, etc.
-        await new Promise(resolve => setTimeout(resolve, 100 * Math.pow(2, attempt)));
-      }
-    }
-  };
-
-  // Fetch stories in batches to avoid overwhelming the connection
-  const fetchStoriesInBatches = async (storyIds, batchSize = 25) => {
-    const results = [];
-
-    for (let i = 0; i < storyIds.length; i += batchSize) {
-      const batch = storyIds.slice(i, i + batchSize);
-      const batchPromises = batch.map(id => fetchStoryWithRetry(id));
-      const batchResults = await Promise.all(batchPromises);
-      results.push(...batchResults);
-
-      // Small delay between batches to avoid connection issues
-      if (i + batchSize < storyIds.length) {
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-    }
-
-    return results;
-  };
-
-  const fetchStoriesWithRemoved = async (removedIds = removedStoryIds) => {
-    try {
-      setLoading(true);
-
-      if (process.env.NODE_ENV === 'development') {
-        const sampleStories = loadSampleData();
-        const storiesWithoutRemoved = sampleStories.filter(story => !removedIds.has(story.id));
-        const sortedStories = sortStories(storiesWithoutRemoved);
-        setStories(sortedStories);
-        setFilteredStories(sortedStories);
-        setLoading(false);
-        return;
-      }
-
-      const topStoriesResponse = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
-      const topStoryIds = await topStoriesResponse.json();
-
-      const storyDetails = await fetchStoriesInBatches(topStoryIds.slice(0, MAX_STORIES));
-
-      const validStories = storyDetails
-        .filter(story => story && !story.deleted && !story.dead && (story.descendants || 0) >= 50);
-
-      const storiesWithoutRemoved = validStories.filter(story => !removedIds.has(story.id));
-      const sortedStories = sortStories(storiesWithoutRemoved);
-
-      setStories(sortedStories);
-      setFilteredStories(sortedStories);
-      setLoading(false);
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
-
+  // Filter stories for the active tab
   const filterStories = (query) => {
+    const tab = activeTab;
     if (!query.trim()) {
-      setFilteredStories(sortStories(stories, sortByComments));
+      updateTab(activeTabIndex, {
+        filteredStories: sortStories(tab.stories, tab.sortByComments),
+      });
       return;
     }
 
-    const filtered = stories.filter(story =>
+    const filtered = tab.stories.filter(story =>
       story.title.toLowerCase().includes(query.toLowerCase()) ||
-      (story.by && story.by.toLowerCase().includes(query.toLowerCase())) ||
+      (story.author && story.author.toLowerCase().includes(query.toLowerCase())) ||
       (story.url && story.url.toLowerCase().includes(query.toLowerCase()))
     );
-    setFilteredStories(sortStories(filtered, sortByComments));
+    updateTab(activeTabIndex, {
+      filteredStories: sortStories(filtered, tab.sortByComments),
+    });
   };
 
+  // Update scroll position and selection for the active tab
   const updateScrollAndSelection = (newSelectedIndex) => {
-    const maxIndex = filteredStories.length - 1;
+    const tab = activeTab;
+    const maxIndex = tab.filteredStories.length - 1;
     const clampedIndex = Math.max(0, Math.min(newSelectedIndex, maxIndex));
 
-    let newScrollOffset = scrollOffset;
-    if (clampedIndex < scrollOffset) {
+    let newScrollOffset = tab.scrollOffset;
+    if (clampedIndex < tab.scrollOffset) {
       newScrollOffset = clampedIndex;
-    } else if (clampedIndex >= scrollOffset + STORIES_PER_PAGE) {
+    } else if (clampedIndex >= tab.scrollOffset + STORIES_PER_PAGE) {
       newScrollOffset = clampedIndex - STORIES_PER_PAGE + 1;
     }
 
-    setScrollOffset(newScrollOffset);
-    setSelectedIndex(clampedIndex);
+    updateTab(activeTabIndex, {
+      scrollOffset: newScrollOffset,
+      selectedIndex: clampedIndex,
+    });
   };
 
   useInput((input, key) => {
-    if (searchMode) {
+    const tab = activeTab;
+
+    if (tab.searchMode) {
       // Search mode - handle search input
       if (input === 'q' || key.ctrl && input === 'c') {
         exit();
       } else if (key.escape) {
         // Exit search mode and clear filter
-        setSearchMode(false);
-        setSearchQuery('');
-        setFilteredStories([...stories]);
-        setSelectedIndex(0);
-        setScrollOffset(0);
+        updateTab(activeTabIndex, {
+          searchMode: false,
+          searchQuery: '',
+          filteredStories: [...tab.stories],
+          selectedIndex: 0,
+          scrollOffset: 0,
+        });
       } else if (key.return) {
         // Exit search mode but keep filter
-        setSearchMode(false);
-        setSelectedIndex(0);
-        setScrollOffset(0);
+        updateTab(activeTabIndex, {
+          searchMode: false,
+          selectedIndex: 0,
+          scrollOffset: 0,
+        });
       } else if (key.backspace || key.delete) {
         // Handle backspace and filter in real-time
-        const newQuery = searchQuery.slice(0, -1);
-        setSearchQuery(newQuery);
+        const newQuery = tab.searchQuery.slice(0, -1);
+        updateTab(activeTabIndex, { searchQuery: newQuery });
         filterStories(newQuery);
       } else if (input && input.length === 1 && !key.ctrl && !key.meta) {
         // Add character to search query and filter in real-time
-        const newQuery = searchQuery + input;
-        setSearchQuery(newQuery);
+        const newQuery = tab.searchQuery + input;
+        updateTab(activeTabIndex, { searchQuery: newQuery });
         filterStories(newQuery);
       }
     } else if (modalOpen) {
@@ -290,11 +298,11 @@ function App() {
       } else if (key.return) {
         const story = selectedStory;
         if (modalSelectedOption === 0) {
-          // Open HN URL (comments)
+          // Open comments URL
           try {
-            open(`https://news.ycombinator.com/item?id=${story.id}`);
+            open(story.commentsUrl);
           } catch (error) {
-            console.log(`\nError opening HN URL: ${error.message}`);
+            console.log(`\nError opening comments URL: ${error.message}`);
           }
         } else if (modalSelectedOption === 1 && story.url) {
           // Open actual URL
@@ -310,42 +318,6 @@ function App() {
         setSelectedStory(null);
         setModalSelectedOption(0);
       }
-    } else if (drawerOpen) {
-      // Drawer is open - handle drawer navigation
-      if (input === 'q' || key.ctrl && input === 'c') {
-        exit();
-      } else if (key.escape) {
-        setDrawerOpen(false);
-        setSelectedStory(null);
-        setDrawerSelectedOption(0);
-      } else if (key.upArrow || input === 'k') {
-        setDrawerSelectedOption(prev => Math.max(0, prev - 1));
-      } else if (key.downArrow || input === 'j') {
-        setDrawerSelectedOption(prev => Math.min(2, prev + 1));
-      } else if (key.return) {
-        const story = selectedStory;
-        if (drawerSelectedOption === 0) {
-          // Open HN URL (comments)
-          try {
-            open(`https://news.ycombinator.com/item?id=${story.id}`);
-          } catch (error) {
-            console.log(`\nError opening HN URL: ${error.message}`);
-          }
-        } else if (drawerSelectedOption === 1 && story.url) {
-          // Open actual URL
-          try {
-            open(story.url);
-          } catch (error) {
-            console.log(`\nError opening URL: ${error.message}`);
-          }
-        } else if (drawerSelectedOption === 2) {
-          // Remove article from list
-          removeArticle(story.id);
-        }
-        setDrawerOpen(false);
-        setSelectedStory(null);
-        setDrawerSelectedOption(0);
-      }
     } else if (helpOpen) {
       // Help menu is open - handle help menu navigation
       if (input === 'q' || key.ctrl && input === 'c') {
@@ -357,25 +329,42 @@ function App() {
       // Main navigation
       if (input === 'q' || key.ctrl && input === 'c') {
         exit();
+      } else if ((input === 'h' || key.leftArrow) && tabs.length > 1) {
+        // Switch to previous tab
+        const newIndex = activeTabIndex === 0 ? tabs.length - 1 : activeTabIndex - 1;
+        setActiveTabIndex(newIndex);
+        setGKeySequence('');
+      } else if ((input === 'l' || key.rightArrow) && tabs.length > 1) {
+        // Switch to next tab
+        const newIndex = activeTabIndex === tabs.length - 1 ? 0 : activeTabIndex + 1;
+        setActiveTabIndex(newIndex);
+        setGKeySequence('');
       } else if (input === 'r') {
-        // Refresh stories
-        fetchStoriesWithRemoved(removedStoryIds);
-        setSelectedIndex(0);
-        setScrollOffset(0);
+        // Refresh stories for current tab
+        fetchDataForTab(activeTabIndex);
+        updateTab(activeTabIndex, {
+          selectedIndex: 0,
+          scrollOffset: 0,
+        });
       } else if (input === 's') {
         // Toggle sort between comments and date
-        const newSortByComments = !sortByComments;
-        setSortByComments(newSortByComments);
-        const sortedStories = sortStories(stories, newSortByComments);
-        setStories(sortedStories);
-        setFilteredStories(sortStories(filteredStories, newSortByComments));
-        setSelectedIndex(0);
-        setScrollOffset(0);
+        const newSortByComments = !tab.sortByComments;
+        const sortedStories = sortStories(tab.stories, newSortByComments);
+        const sortedFiltered = sortStories(tab.filteredStories, newSortByComments);
+        updateTab(activeTabIndex, {
+          sortByComments: newSortByComments,
+          stories: sortedStories,
+          filteredStories: sortedFiltered,
+          selectedIndex: 0,
+          scrollOffset: 0,
+        });
         setGKeySequence('');
       } else if (input === '/') {
         // Enter search mode
-        setSearchMode(true);
-        setSearchQuery('');
+        updateTab(activeTabIndex, {
+          searchMode: true,
+          searchQuery: '',
+        });
         setGKeySequence('');
       } else if (input === '?') {
         // Open help menu
@@ -394,32 +383,32 @@ function App() {
         }
       } else if (input === 'G' || (key.shift && input === 'g')) {
         // 'G' or 'Shift+G' - go to bottom
-        updateScrollAndSelection(filteredStories.length - 1);
+        updateScrollAndSelection(tab.filteredStories.length - 1);
         setGKeySequence('');
       } else if (key.upArrow || input === 'k') {
-        updateScrollAndSelection(selectedIndex - 1);
+        updateScrollAndSelection(tab.selectedIndex - 1);
         setGKeySequence('');
       } else if (key.downArrow || input === 'j') {
-        updateScrollAndSelection(selectedIndex + 1);
+        updateScrollAndSelection(tab.selectedIndex + 1);
         setGKeySequence('');
-      } else if (input === 'd' && filteredStories[selectedIndex]) {
+      } else if (input === 'd' && tab.filteredStories[tab.selectedIndex]) {
         // Remove current article directly with 'd' key
-        const story = filteredStories[selectedIndex];
+        const story = tab.filteredStories[tab.selectedIndex];
         removeArticle(story.id);
         setGKeySequence('');
-      } else if (key.return && filteredStories[selectedIndex]) {
-        const story = filteredStories[selectedIndex];
+      } else if (key.return && tab.filteredStories[tab.selectedIndex]) {
+        const story = tab.filteredStories[tab.selectedIndex];
         setSelectedStory(story);
         setModalOpen(true);
         setModalSelectedOption(0);
         setGKeySequence('');
-      } else if (input === ' ' && filteredStories[selectedIndex]) {
-        // Open HN comments page directly with spacebar
-        const story = filteredStories[selectedIndex];
+      } else if (input === ' ' && tab.filteredStories[tab.selectedIndex]) {
+        // Open comments page directly with spacebar
+        const story = tab.filteredStories[tab.selectedIndex];
         try {
-          open(`https://news.ycombinator.com/item?id=${story.id}`);
+          open(story.commentsUrl);
         } catch (error) {
-          console.log(`\nError opening HN URL: ${error.message}`);
+          console.log(`\nError opening comments URL: ${error.message}`);
         }
         setGKeySequence('');
       } else {
@@ -430,20 +419,20 @@ function App() {
   });
 
 
-  if (loading) {
+  if (activeTab.loading) {
     return (
       <Box flexDirection="column" padding={1}>
-        <Text color={colors.primary} bold>Hacker News</Text>
-        <Text>Loading stories sorted by {sortByComments ? 'comments' : 'date'}...</Text>
+        <Text color={colors.primary} bold>{activeTab.title}</Text>
+        <Text>Loading stories sorted by {activeTab.sortByComments ? 'comments' : 'date'}...</Text>
       </Box>
     );
   }
 
-  if (error) {
+  if (activeTab.error) {
     return (
       <Box flexDirection="column" padding={1}>
         <Text color={colors.error} bold>Error loading stories:</Text>
-        <Text>{error}</Text>
+        <Text>{activeTab.error}</Text>
         <Text dimColor={colors.dim}>Press 'q' to quit</Text>
       </Box>
     );
@@ -452,22 +441,28 @@ function App() {
   return (
     <Box width="100%" height="100%">
       <Box flexDirection="column" padding={1}>
+        {tabs.length > 1 && (
+          <Tabs tabs={tabs} activeTabIndex={activeTabIndex} />
+        )}
+
         <Box marginBottom={1}>
-          <Text color={colors.primary} bold>Hacker News - Sorted by {sortByComments ? 'Comments' : 'Date'}</Text>
+          <Text color={colors.primary} bold>
+            {activeTab.title} - Sorted by {activeTab.sortByComments ? 'Comments' : 'Date'}
+          </Text>
         </Box>
 
-        {searchMode && <SearchBox searchQuery={searchQuery} />}
+        {activeTab.searchMode && <SearchBox searchQuery={activeTab.searchQuery} />}
 
         <StoryList
-          stories={filteredStories}
-          selectedIndex={selectedIndex}
-          scrollOffset={scrollOffset}
+          stories={activeTab.filteredStories}
+          selectedIndex={activeTab.selectedIndex}
+          scrollOffset={activeTab.scrollOffset}
           storiesPerPage={STORIES_PER_PAGE}
         />
 
-        {filteredStories.length !== stories.length && (
+        {activeTab.filteredStories.length !== activeTab.stories.length && (
           <Box marginTop={1}>
-            <Text dimColor={colors.dim}>Filtered from {stories.length} total</Text>
+            <Text dimColor={colors.dim}>Filtered from {activeTab.stories.length} total</Text>
           </Box>
         )}
 

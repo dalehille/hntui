@@ -38,6 +38,11 @@ const HelpMenu = () => {
                         <Text color={colors.foreground}>G</Text>
                         <Text dimColor={colors.dim}> - Go to bottom</Text>
                     </Box>
+
+                    <Box marginBottom={0}>
+                        <Text color={colors.foreground}>h/l or ←/→</Text>
+                        <Text dimColor={colors.dim}> - Switch tabs</Text>
+                    </Box>
                 </Box>
 
                 <Box marginBottom={0} marginTop={1}>
@@ -52,7 +57,7 @@ const HelpMenu = () => {
 
                     <Box marginBottom={0}>
                         <Text color={colors.foreground}>Space</Text>
-                        <Text dimColor={colors.dim}> - Open HN comments directly</Text>
+                        <Text dimColor={colors.dim}> - Open comments directly</Text>
                     </Box>
 
                     <Box marginBottom={0}>

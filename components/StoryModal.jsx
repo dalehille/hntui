@@ -29,7 +29,7 @@ const StoryModal = ({ selectedStory, modalSelectedOption }) => {
           paddingY={0.5}
         >
           <Text color={modalSelectedOption === 0 ? colors.foreground : undefined}>
-            1. Open Hacker News comments
+            1. Open comments
           </Text>
         </Box>
 

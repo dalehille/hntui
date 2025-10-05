@@ -1,3 +1,5 @@
 node_modules
-.removed-articles.json
-.removed-articles.json.save
+.removed-articles*
+.cache-*.json
+bun.lockb
+bun.lock

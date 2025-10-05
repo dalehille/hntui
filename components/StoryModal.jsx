@@ -14,7 +14,7 @@ const StoryModal = ({ selectedStory, modalSelectedOption }) => {
       position="absolute"
       top="50%"
       left="50%"
-      width="60%"
+      width="80%"
       height="40%"
       borderStyle="round"
       borderColor={colors.primary}
